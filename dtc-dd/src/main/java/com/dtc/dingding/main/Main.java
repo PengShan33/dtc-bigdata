@@ -45,7 +45,7 @@ public class Main {
             if ("true".equals(String.valueOf(job.get("createDeptGroup")))) {
                 String id = job.get("id").toString();
                 // 获取打卡信息: 2)获取各部门人员列表
-//                DingUtils.getDepartmentUser(Long.parseLong(id), access_token, props);
+                DingUtils.getDepartmentUser(Long.parseLong(id), access_token, props);
             }
         }
         try {
