@@ -34,7 +34,7 @@ public class Main {
 
         // 1.获取token
         String access_token = DingUtils.getAccess_Token(appid, appsecret, props);
-//        String access_token="96a36fbc1be33f19b9d4262ea43b763f";
+//        String access_token="6945715ee1c730b39b10afb028e6a115";
 //        System.out.println("token:" + access_token);
 
         // 2.获取打卡数据: 1)获取部门列表

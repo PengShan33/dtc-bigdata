@@ -8,6 +8,7 @@ import com.dingtalk.api.DingTalkClient;
 import com.dingtalk.api.request.*;
 import com.dingtalk.api.response.*;
 import com.dtc.dingding.model.UserModel;
+import com.dtc.dingding.model.UserIdModel;
 import com.google.gson.Gson;
 import com.taobao.api.ApiException;
 
@@ -65,7 +66,7 @@ public class DingUtils {
      * @param props        配置参数
      */
     public static void getDepartmentUser(long departmentID, String access_token, Properties props) {
-        String name = null;
+
         DingTalkClient client = new DefaultDingTalkClient(props.get(PropertiesConstants.DD_BUMEN_USER).toString().trim());
         OapiUserSimplelistRequest request = new OapiUserSimplelistRequest();
         request.setDepartmentId(departmentID);
@@ -105,6 +106,8 @@ public class DingUtils {
     private static String getUserInfo(String userID, String access_token, Properties props) {
         String body;
         String jsonString = null;
+        Map<String, String> userInfo = new HashMap<>();
+
         DingTalkClient client = new DefaultDingTalkClient(props.get(PropertiesConstants.DD_USER_INFO).toString().trim());
         OapiUserGetRequest request = new OapiUserGetRequest();
         request.setUserid(userID);
@@ -129,6 +132,14 @@ public class DingUtils {
             record.put("mobile", jsonObject.get("mobile").toString());
             record.put("name", jsonObject.get("name").toString());
             jsonString = JSON.toJSONString(record);
+
+            userInfo.put("userid", jsonObject.get("userid").toString());
+            userInfo.put("name", jsonObject.get("name").toString());
+            userInfo.put("mobile", jsonObject.get("mobile").toString());
+            String userInfoStr = JSON.toJSONString(userInfo);
+            Gson gson = new Gson();
+            UserIdModel model = gson.fromJson(userInfoStr, UserIdModel.class);
+            SinkUtils.writeMysql("SC_KQ_USERID", model, props);
         } catch (ApiException e) {
             e.printStackTrace();
         }

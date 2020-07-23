@@ -31,8 +31,8 @@ public class JiaBan {
         Map<String, String> time = getTime();
         Long starttime = Long.parseLong(time.get("starttime"));
         Long endtime = Long.parseLong(time.get("endtime"));
-//        Long starttime = Long.parseLong("1594569600000");
-//        Long endtime = Long.parseLong("1594656000000");
+//        Long starttime = Long.parseLong("1594828800000");
+//        Long endtime = Long.parseLong("1594915200000");
         req.setStartTime(starttime);
         req.setEndTime(endtime);
         OapiProcessinstanceListidsResponse response = client.execute(req, access_token);

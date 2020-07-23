@@ -18,12 +18,27 @@ public class SinkUtils {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String jisuan_riqi = sdf.format(new Date(Long.valueOf(time)));
 
+        UserIdModel userIdModel = null;
         UserModel userModel = null;
         QJModel jqModel = null;
         BKModel bkModel = null;
         JBModel jbModel =null;
 
-        if (model instanceof UserModel) {
+        if (model instanceof UserIdModel) {
+            userIdModel = (UserIdModel) model;
+
+            String sql = "replace into " + tableName + "(" + "user_id," + "name," + "mobile" + ") values(?,?,?)";//数据库操作语句（插入）
+            try {
+                con = MySQLUtils.getConnection(props);
+                PreparedStatement pst = con.prepareStatement(sql);//用来执行SQL语句查询，对sql语句进行预编译处理
+                pst.setString(1, userIdModel.getUserid());
+                pst.setString(2, userIdModel.getName());
+                pst.setString(3,userIdModel.getMobile());
+                pst.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }else if (model instanceof UserModel) {
             userModel = (UserModel) model;
             String daka_riqi = getBeforeTime();
 
