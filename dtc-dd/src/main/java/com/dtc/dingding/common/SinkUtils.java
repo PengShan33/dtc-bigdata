@@ -137,7 +137,7 @@ public class SinkUtils {
         }
     }
 
-    private static String getBeforeTime() {
+    public static String getBeforeTime() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -1);

@@ -23,7 +23,7 @@ import static com.dtc.dingding.common.DingUtils.getTime;
 import static com.dtc.dingding.common.SinkUtils.writeMysql;
 
 public class QingJia {
-    public static void getQingJia(String access_token, Properties props) throws ApiException{
+    public static void getQingJia(String access_token, Properties props) throws ApiException, ParseException {
         // 3.获取请假数据: 1)获取请假审批列表
         DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/processinstance/listids");
         OapiProcessinstanceListidsRequest req = new OapiProcessinstanceListidsRequest();

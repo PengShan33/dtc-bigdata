@@ -48,15 +48,15 @@ public class Main {
                 DingUtils.getDepartmentUser(Long.parseLong(id), access_token, props);
             }
         }
-        try {
-            // 3.获取请假数据
-            QingJia.getQingJia(access_token,props);
-            // 4.获取补卡数据
-            BuKa.getBuKa(access_token,props);
-            // 5.获取加班数据
-            JiaBan.getJiaBan(access_token,props);
-        } catch (ApiException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            // 3.获取请假数据
+//            QingJia.getQingJia(access_token,props);
+//            // 4.获取补卡数据
+//            BuKa.getBuKa(access_token,props);
+//            // 5.获取加班数据
+//            JiaBan.getJiaBan(access_token,props);
+//        } catch (ApiException e) {
+//            e.printStackTrace();
+//        }
     }
 }

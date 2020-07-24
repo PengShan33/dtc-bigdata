@@ -12,8 +12,11 @@ import com.dtc.dingding.model.UserIdModel;
 import com.google.gson.Gson;
 import com.taobao.api.ApiException;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static com.dtc.dingding.common.SinkUtils.getBeforeTime;
 
 public class DingUtils {
 
@@ -140,7 +143,7 @@ public class DingUtils {
             Gson gson = new Gson();
             UserIdModel model = gson.fromJson(userInfoStr, UserIdModel.class);
             SinkUtils.writeMysql("SC_KQ_USERID", model, props);
-        } catch (ApiException e) {
+        } catch (ApiException | ParseException e) {
             e.printStackTrace();
         }
         return jsonString;
@@ -155,7 +158,7 @@ public class DingUtils {
      * @return
      * @throws ApiException
      */
-    private static Map<String, String> getRecord(String userID, String access_token, Properties props) throws ApiException {
+    private static Map<String, String> getRecord(String userID, String access_token, Properties props) throws ApiException, ParseException {
         DingTalkClient client = new DefaultDingTalkClient(props.get(PropertiesConstants.DD_DAKA).toString().trim());
 //        OapiAttendanceListRecordRequest request = new OapiAttendanceListRecordRequest();
         OapiAttendanceListRequest request = new OapiAttendanceListRequest();
@@ -218,14 +221,18 @@ public class DingUtils {
         return map;
     }
 
-    public static Map<String, String> getTime() {
+    public static Map<String, String> getTime() throws ParseException {
         Map<String, String> map = new HashMap<>();
-        long timeStamp = System.currentTimeMillis();
-        long yzero = timeStamp / (1000 * 3600 * 24) * (1000 * 3600 * 24) - TimeZone.getDefault().getRawOffset() - 24 * 60 * 60 * 1000;
-        long zero = timeStamp / (1000 * 3600 * 24) * (1000 * 3600 * 24) - TimeZone.getDefault().getRawOffset();
+        Date date = new Date();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String today = simpleDateFormat.format(date.getTime());
+        long todayTime = simpleDateFormat.parse(today).getTime();
 
-        map.put("starttime", String.valueOf(yzero));
-        map.put("endtime", String.valueOf(zero));
+        String yesterday = getBeforeTime();
+        long yesterdayTime = simpleDateFormat.parse(yesterday).getTime();
+
+        map.put("starttime", String.valueOf(yesterdayTime));
+        map.put("endtime", String.valueOf(todayTime));
         return map;
     }
 

@@ -14,6 +14,7 @@ import com.dtc.dingding.model.BKModel;
 import com.google.gson.Gson;
 import com.taobao.api.ApiException;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -22,7 +23,7 @@ import static com.dtc.dingding.common.DingUtils.getTime;
 import static com.dtc.dingding.common.SinkUtils.writeMysql;
 
 public class BuKa {
-    public static void getBuKa(String access_token, Properties props) throws ApiException {
+    public static void getBuKa(String access_token, Properties props) throws ApiException, ParseException {
         // 4.获取补卡数据: 1)获取补卡审批列表
         DingTalkClient client = new DefaultDingTalkClient("https://oapi.dingtalk.com/topapi/processinstance/listids");
         OapiProcessinstanceListidsRequest req = new OapiProcessinstanceListidsRequest();
