@@ -17,7 +17,7 @@ public class H3cMapFunction implements MapFunction<DataStruct, DataStruct> {
         String LastCode = event.getZbLastCode();
         if (LastCode.contains(".")) {
             String lastCode = fourCode+"_"+LastCode.split("\\.", 2)[0];
-            if ("102_101_101_101_101".equals(lastCode) || "102_101_102_102_102".equals(lastCode) || "201_101_102_103_103".equals(lastCode)) {
+            if ("102_101_101_101_101".equals(lastCode) || "102_101_102_102_102".equals(lastCode) || "102_101_102_103_103".equals(lastCode)) {
                 String nameCode = LastCode.split("\\.", 2)[1];
                 //板卡
                 return new DataStruct(event.getSystem_name() + "|h3c_0", event.getHost(), lastCode, nameCode, event.getNameCN(), event.getNameEN(), event.getTime(), event.getValue());
