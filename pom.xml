@@ -14,12 +14,13 @@
         <module>dtc-SC</module>
         <module>dtc-dd-data</module>
         <module>dtc-flink-log</module>
-        <module>dtc-dist</module>
         <module>dtc-dd</module>
-
-
+        <module>dtc-dist</module>
     </modules>
     <properties>
+        <final_name>dtc-bigdata-${project.version}-${dev.build.timestamp}</final_name>
+        <maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format>
+        <dev.build.timestamp>${maven.build.timestamp}</dev.build.timestamp>
         <hb.verison>2.0.4</hb.verison>
         <hadoop.version>2.8.4</hadoop.version>
         <curator-client.version>4.0.0</curator-client.version>

@@ -22,7 +22,8 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>dtc-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <finalName>${final_name}</finalName>
                             <descriptors>
                                 <descriptor>src/assembly/bin-common.xml</descriptor>
                             </descriptors>

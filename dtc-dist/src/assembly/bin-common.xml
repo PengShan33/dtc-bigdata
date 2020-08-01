@@ -10,7 +10,7 @@
         <format>tar.gz</format>
     </formats>
 
-    <baseDirectory>dtc-${project.version}-bin</baseDirectory>
+    <baseDirectory>${final_name}</baseDirectory>
 
 <!--    <dependencySets>-->
 <!--        <dependencySet>-->
@@ -55,6 +55,7 @@
                 <include>bin/**</include>
             </includes>
             <fileMode>0777</fileMode>
+            <lineEnding>unix</lineEnding>
             <directoryMode>0755</directoryMode>
         </fileSet>
 
