@@ -259,7 +259,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
     }
 
     /**
-     * 端口出流量
+     * 端口出流量总计
      *
      * @param out
      */
@@ -268,10 +268,10 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
             double outOctetsSize = 0;
             String systemName = null;
             String host = null;
-            String zbFourName = "101_102_105_102_102";
+            String zbFourName = "101_102_105_118_118";
             String zbLastCode = "";
-            String nameCn = "端口出流量";
-            String nameEn = "aix_out_octets";
+            String nameCn = "端口出流量总计";
+            String nameEn = "aix_out_octets_total";
             String time = String.valueOf(System.currentTimeMillis());
             for (String key1 : outOctetsMap.keySet()) {
                 String[] split = key1.split("-");
@@ -287,7 +287,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
     }
 
     /**
-     * 端口入流量
+     * 端口入流量总计
      *
      * @param out
      */
@@ -296,10 +296,10 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
             double inOctetsSize = 0;
             String systemName = null;
             String host = null;
-            String zbFourName = "101_102_105_101_101";
+            String zbFourName = "101_102_105_119_119";
             String zbLastCode = "";
-            String nameCn = "端口入流量";
-            String nameEn = "aix_in_octets";
+            String nameCn = "端口入流量总计";
+            String nameEn = "aix_in_octets_total";
             String time = String.valueOf(System.currentTimeMillis());
             for (String key1 : inOctetsMap.keySet()) {
                 String[] split = key1.split("-");
@@ -315,7 +315,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
     }
 
     /**
-     * 接收报文数
+     * 接收报文数总计
      *
      * @param out
      */
@@ -325,10 +325,10 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
             long inNUcastPktsNum = 0;
             String systemName = null;
             String host = null;
-            String zbFourName = "101_102_105_118_118";
+            String zbFourName = "101_102_105_120_120";
             String zbLastCode = "";
-            String nameCn = "接收报文数";
-            String nameEn = "aix_net_packets_recv";
+            String nameCn = "接收报文数总计";
+            String nameEn = "aix_net_packets_recv_total";
             String time = String.valueOf(System.currentTimeMillis());
             for (String key1 : inUcastPktsMap.keySet()) {
                 String[] split = key1.split("-");
@@ -349,7 +349,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
     }
 
     /**
-     * 发送报文数
+     * 发送报文数总计
      *
      * @param out
      */
@@ -359,10 +359,10 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
             long outNUcastPktsNum = 0;
             String systemName = null;
             String host = null;
-            String zbFourName = "101_102_105_119_119";
+            String zbFourName = "101_102_105_121_121";
             String zbLastCode = "";
-            String nameCn = "发送报文数";
-            String nameEn = "aix_net_packets_sent";
+            String nameCn = "发送报文数总计";
+            String nameEn = "aix_net_packets_sent_total";
             String time = String.valueOf(System.currentTimeMillis());
             for (String key1 : outUcastPktsMap.keySet()) {
                 String[] split = key1.split("-");
@@ -383,7 +383,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
     }
 
     /**
-     * 接收错误报文数
+     * 接收错误报文数总计
      *
      * @param out
      */
@@ -392,10 +392,10 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
             long inErrorsNum = 0;
             String systemName = null;
             String host = null;
-            String zbFourName = "101_102_105_113_113";
+            String zbFourName = "101_102_105_122_122";
             String zbLastCode = "";
-            String nameCn = "接收错误报文数";
-            String nameEn = "aix_net_err_in";
+            String nameCn = "接收错误报文数总计";
+            String nameEn = "aix_net_err_in_total";
             String time = String.valueOf(System.currentTimeMillis());
             for (String key1 : inErrorsMap.keySet()) {
                 String[] split = key1.split("-");
@@ -411,7 +411,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
     }
 
     /**
-     * 发送错误报文数
+     * 发送错误报文数总计
      *
      * @param out
      */
@@ -420,10 +420,10 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
             long outErrorsNum = 0;
             String systemName = null;
             String host = null;
-            String zbFourName = "101_102_105_115_115";
+            String zbFourName = "101_102_105_123_123";
             String zbLastCode = "";
-            String nameCn = "发送错误报文数";
-            String nameEn = "aix_net_err_out";
+            String nameCn = "发送错误报文数总计";
+            String nameEn = "aix_net_err_out_total";
             String time = String.valueOf(System.currentTimeMillis());
             for (String key1 : outErrorsMap.keySet()) {
                 String[] split = key1.split("-");
