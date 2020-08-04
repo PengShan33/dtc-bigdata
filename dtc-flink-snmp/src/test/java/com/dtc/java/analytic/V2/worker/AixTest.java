@@ -30,14 +30,14 @@ public class AixTest {
         props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
-        String topic = "aixTest01";
+        String topic = "DTCsnmpTest05";
 //        FlinkKafkaConsumer<String> consumer = new FlinkKafkaConsumer<String>(topic, new SimpleStringSchema(), props);
 //        DataStreamSource<String> aixSourceStream = env.addSource(consumer);
         FlinkKafkaConsumer<SourceEvent> consumer = new FlinkKafkaConsumer<>(topic, new SourceEventSchema(), props);
         consumer.setStartFromLatest();
         DataStreamSource<SourceEvent> aixSourceStream = env.addSource(consumer);
 
-        aixSourceStream.print();
+//        aixSourceStream.print();
 
         SingleOutputStreamOperator<DataStruct> aixMapStream = aixSourceStream.map(new MainUntils.MyMapFunctionV3());
         aixMapStream.map(new AixMapFunction())

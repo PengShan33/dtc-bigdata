@@ -24,11 +24,13 @@ public class PSinkToOpentsdb extends RichSinkFunction<DataStruct> {
         this.properties = prop;
     }
 
+    @Override
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
         httpClient = new HttpClientImpl(properties);
     }
 
+    @Override
     public void invoke(DataStruct value) {
 
         try {
@@ -52,7 +54,7 @@ public class PSinkToOpentsdb extends RichSinkFunction<DataStruct> {
             } else if (value.getSystem_name().contains("zx")) {
                 String metircs = metric + "-" + host + "-" + id;
                 long l = System.currentTimeMillis();
-                //华三交换机存储opentsdb策略
+                //中兴交换机存储opentsdb策略
                 builder.addMetric(metircs)
                         .setDataPoint(time, result)
                         .addTag("type", "zx_swtich")
@@ -60,7 +62,7 @@ public class PSinkToOpentsdb extends RichSinkFunction<DataStruct> {
             } else if (value.getSystem_name().contains("dpi")) {
                 String metircs = metric + "-" + host + "-" + id;
                 long l = System.currentTimeMillis();
-                //华三交换机存储opentsdb策略
+                //dpi存储opentsdb策略
                 builder.addMetric(metircs)
                         .setDataPoint(time, result)
                         .addTag("type", "dpi")
@@ -80,7 +82,13 @@ public class PSinkToOpentsdb extends RichSinkFunction<DataStruct> {
                             .addTag("lastcode", id)
                             .addTag("host", host);
                 }
-            } else {
+            } else if (value.getSystem_name().contains("aix")){
+                builder.addMetric(metric + "-" + host)
+                        .setDataPoint(time, result)
+                        .addTag("type", "aix")
+                        .addTag("host", host);
+            }
+            else {
                 builder.addMetric(metric + "-" + host)
                         .setDataPoint(time, result)
                         .addTag("host", host);

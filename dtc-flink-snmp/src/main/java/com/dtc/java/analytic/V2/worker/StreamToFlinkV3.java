@@ -57,8 +57,8 @@ public class StreamToFlinkV3 {
                 BasicTypeInfo.STRING_TYPE_INFO,
                 BasicTypeInfo.STRING_TYPE_INFO);
         ParameterTool parameterTool = ExecutionEnvUtil.createParameterTool(args);
-        String opentsdb_url = parameterTool.get(PropertiesConstants.OPENTSDB_URL, "http://10.7.232:4399").trim();
-        int windowSizeMillis = parameterTool.getInt(PropertiesConstants.WINDOWS_SIZE, 2000);
+        String opentsdb_url = parameterTool.get(PropertiesConstants.OPENTSDB_URL, "http://10.3.7.231:4399").trim();
+        int windowSizeMillis = parameterTool.getInt(PropertiesConstants.WINDOWS_SIZE, 10*1000);
         TimesConstats build = getSize(parameterTool);
         StreamExecutionEnvironment env = ExecutionEnvUtil.prepare(parameterTool);
         env.getConfig().setGlobalJobParameters(parameterTool);
@@ -84,13 +84,14 @@ public class StreamToFlinkV3 {
         Win_Data_Process(opentsdb_url, windowSizeMillis, broadcast, splitStream, build);
         //linux指标数据处理
         Linux_Data_Process(opentsdb_url, windowSizeMillis, broadcast, splitStream, build);
+        //aix指标数据处理
+        Aix_Data_Process(opentsdb_url, windowSizeMillis, broadcast, splitStream, build);
         //h3c交换机处理
         H3c_Data_Process(opentsdb_url, windowSizeMillis, broadcast, splitStream, parameterTool, build);
         ZX_Data_Process(opentsdb_url, windowSizeMillis, broadcast, splitStream, parameterTool, build);
         DPI_Data_Process(opentsdb_url, windowSizeMillis, broadcast, splitStream, parameterTool, build);
         env.execute("Dtc-Alarm-Flink-Process");
     }
-
 
     private static void Win_Data_Process(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, TimesConstats build) {
         SingleOutputStreamOperator<DataStruct> winProcess = splitStream
@@ -129,6 +130,18 @@ public class StreamToFlinkV3 {
         //Linux数据进行告警规则判断并将告警数据写入mysql
         List<DataStream<AlterStruct>> alarmLinux = getAlarm(linuxProcess, broadcast, build);
         alarmLinux.forEach(e -> e.addSink(new MysqlSink()));
+    }
+
+    private static void Aix_Data_Process(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, TimesConstats build) {
+        SingleOutputStreamOperator<DataStruct> aixProcess = splitStream
+                .select("Aix")
+                .map(new AixMapFunction())
+                .keyBy("Host")
+                .timeWindow(Time.of(windowSizeMillis, TimeUnit.MILLISECONDS))
+                .process(new AixProcessMapFunction());
+
+        // aix指标数据写入opentsdb
+        aixProcess.addSink(new PSinkToOpentsdb(opentsdb_url));
     }
 
     private static void H3c_Data_Process(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, ParameterTool parameterTool, TimesConstats build) {

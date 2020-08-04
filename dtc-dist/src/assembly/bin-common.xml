@@ -115,7 +115,6 @@
                         </unpackOptions>
                         <fileMode>0777</fileMode>
                         <directoryMode>0755</directoryMode>
-                        <lineEnding>unix</lineEnding>
                     </dependencySet>
                 </dependencySets>
             </binaries>

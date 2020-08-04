@@ -10,12 +10,12 @@ public class AixMapFunction implements MapFunction<DataStruct, DataStruct> {
         if (zbLastCode.contains(".")) {
             String lastCode = zbLastCode.split("\\.", 2)[0];
             String zbLastCode_Result = zbLastCode.split("\\.", 2)[1];
-            String code_Result = event.getZbFourName() + "_" +  lastCode;
-            return new DataStruct(event.getSystem_name(), event.getHost(), code_Result, zbLastCode_Result, event.getNameCN(), event.getNameEN(), event.getTime(), event.getValue());
+            String code_Result = event.getZbFourName() + "_" + lastCode;
+            return new DataStruct(event.getSystem_name() + "|aix_0", event.getHost(), code_Result, zbLastCode_Result, event.getNameCN(), event.getNameEN(), event.getTime(), event.getValue());
         } else {
             String zbLastCode_Result = "";
             String code_Result = event.getZbFourName() + "_" + event.getZbLastCode();
-            return new DataStruct(event.getSystem_name(), event.getHost(), code_Result, zbLastCode_Result, event.getNameCN(), event.getNameEN(), event.getTime(), event.getValue());
+            return new DataStruct(event.getSystem_name() + "|aix_1", event.getHost(), code_Result, zbLastCode_Result, event.getNameCN(), event.getNameEN(), event.getTime(), event.getValue());
         }
     }
 }

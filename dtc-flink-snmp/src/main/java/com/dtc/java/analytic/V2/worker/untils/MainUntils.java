@@ -43,6 +43,8 @@ public class MainUntils {
                 output.add("Win");
             } else if ("101_101".equals(type)) {
                 output.add("Linux");
+            } else if ("101_102".equals(type)) {
+                output.add("Aix");
             } else if ("102_101".equals(type)) {
                 output.add("H3C_Switch");
             } else if ("102_102".equals(type)) {
