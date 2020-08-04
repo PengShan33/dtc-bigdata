@@ -276,7 +276,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
             for (String key1 : outOctetsMap.keySet()) {
                 String[] split = key1.split("-");
                 host = split[0];
-                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1];
+                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|aix";
 
                 outOctetsSize += Double.parseDouble(outOctetsMap.get(key1));
             }
@@ -304,7 +304,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
             for (String key1 : inOctetsMap.keySet()) {
                 String[] split = key1.split("-");
                 host = split[0];
-                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1];
+                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|aix";
 
                 inOctetsSize += Double.parseDouble(inOctetsMap.get(key1));
             }
@@ -333,7 +333,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
             for (String key1 : inUcastPktsMap.keySet()) {
                 String[] split = key1.split("-");
                 host = split[0];
-                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1];
+                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|aix";
 
                 inUcastPktsNum += Long.parseLong(inUcastPktsMap.get(key1));
             }
@@ -367,7 +367,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
             for (String key1 : outUcastPktsMap.keySet()) {
                 String[] split = key1.split("-");
                 host = split[0];
-                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1];
+                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|aix";
 
                 outUcastPktsNum += Long.parseLong(outUcastPktsMap.get(key1));
             }
@@ -400,7 +400,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
             for (String key1 : inErrorsMap.keySet()) {
                 String[] split = key1.split("-");
                 host = split[0];
-                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1];
+                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|aix";
 
                 inErrorsNum += Long.parseLong(inErrorsMap.get(key1));
             }
@@ -428,7 +428,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
             for (String key1 : outErrorsMap.keySet()) {
                 String[] split = key1.split("-");
                 host = split[0];
-                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1];
+                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|aix";
 
                 outErrorsNum += Long.parseLong(outErrorsMap.get(key1));
             }
@@ -458,7 +458,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
             for (String key1 : diskBlockSize.keySet()) {
                 String[] split = key1.split("-");
                 host = split[0];
-                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1];
+                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|aix";
 
                 diskSize += Double.parseDouble(diskBlockSize.get(key1));
             }
@@ -493,7 +493,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
 
                 String[] split = key1.split("-");
                 host = split[0];
-                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1];
+                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|aix";
                 String key2 = split[0] + "-" + "101_102_104_106_106" + "-" + split[2];
                 double usedNum = Double.parseDouble(cuUsedNum.get(key2));
                 usedSize = usedSize + size * usedNum / bytes2GbUnit;
