@@ -42,6 +42,8 @@ public class SinkUtils {
             userModel = (UserModel) model;
             String daka_riqi = getBeforeTime();
 
+//            String daka_riqi = daka;
+
             String sql = "replace into " + tableName + "(" + "user_id," + "name," + "mobile," + "department," + "OnDuty," + "OnBaseTime," + "OffDuty," + "OffBaseTime," + "daka_riqi," + "jisuan_riqi" + ") values(?,?,?,?,?,?,?,?,?,?)";//数据库操作语句（插入）
             //  String sql1 = "insert ignore into USER (user_id,unionid,openIdmobile,department,OnDuty,OffDuty,riqi,name,jisuan_riqi,OnResult,OffResult) values(?,?,?,?,?,?,?,?,?,?,?,?)";//数据库操作语句（插入）
             try {
@@ -108,20 +110,21 @@ public class SinkUtils {
         } else if (model instanceof JBModel) {
             jbModel = (JBModel) model;
             try {
-                String sql = "replace into " + tableName + "(" + "user_id," + "duration," + "start_time," + "end_time," + "reason," + "approve_status,"  + "first_approver_userid," +"first_approve_time," +"second_approver_userid," + "second_approve_time," + "jisuan_riqi" + ") values(?,?,?,?,?,?,?,?,?,?,?)";//数据库操作语句（插入）
+                String sql = "replace into " + tableName + "(" + "user_id," +  "create_time," + "duration," + "start_time," + "end_time," + "reason," + "approve_status,"  + "first_approver_userid," +"first_approve_time," +"second_approver_userid," + "second_approve_time," + "jisuan_riqi" + ") values(?,?,?,?,?,?,?,?,?,?,?,?)";//数据库操作语句（插入）
                 con = MySQLUtils.getConnection(props);
                 PreparedStatement pst = con.prepareStatement(sql);//用来执行SQL语句查询，对sql语句进行预编译处理
                 pst.setString(1, jbModel.getUserid());
-                pst.setString(2, jbModel.getTime());
-                pst.setString(3, jbModel.getStarttime());
-                pst.setString(4, jbModel.getEndtime());
-                pst.setString(5, jbModel.getReason());
-                pst.setString(6, jbModel.getStatus());
-                pst.setString(7, jbModel.getFirstApprover());
-                pst.setString(8, jbModel.getFirstApproveTime());
-                pst.setString(9, jbModel.getSecondApprover());
-                pst.setString(10, jbModel.getSecondApproveTime());
-                pst.setString(11, jisuan_riqi);
+                pst.setString(2,jbModel.getCreateTime());
+                pst.setString(3, jbModel.getTime());
+                pst.setString(4, jbModel.getStarttime());
+                pst.setString(5, jbModel.getEndtime());
+                pst.setString(6, jbModel.getReason());
+                pst.setString(7, jbModel.getStatus());
+                pst.setString(8, jbModel.getFirstApprover());
+                pst.setString(9, jbModel.getFirstApproveTime());
+                pst.setString(10, jbModel.getSecondApprover());
+                pst.setString(11, jbModel.getSecondApproveTime());
+                pst.setString(12, jisuan_riqi);
                 pst.executeUpdate();//解释在下
             } catch (SQLException e) {
                 e.printStackTrace();

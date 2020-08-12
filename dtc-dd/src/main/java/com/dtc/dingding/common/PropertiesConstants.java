@@ -20,4 +20,8 @@ public class PropertiesConstants {
     public static final String MYSQL_PASSWORD = "mysql.password";
     public static final String MYSQL_PORT = "mysql.port";
     public static final String MYSQL_USERNAME = "mysql.username";
+
+    public static final String START_TIME = "dd.startTime";
+    public static final String END_TIME = "dd.endTime";
+    public static final String DAKA_RIQI = "dd.dakariqi";
 }

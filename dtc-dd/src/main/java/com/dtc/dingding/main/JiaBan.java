@@ -32,8 +32,7 @@ public class JiaBan {
         Map<String, String> time = getTime();
         Long starttime = Long.parseLong(time.get("starttime"));
         Long endtime = Long.parseLong(time.get("endtime"));
-//        Long starttime = Long.parseLong("1594828800000");
-//        Long endtime = Long.parseLong("1594915200000");
+
         req.setStartTime(starttime);
         req.setEndTime(endtime);
         OapiProcessinstanceListidsResponse response = client.execute(req, access_token);
@@ -54,6 +53,8 @@ public class JiaBan {
             Map<String, String> map = new HashMap<>();
             JSONObject jsonObject1 = JSONObject.parseObject(body);
             String status = jsonObject1.getJSONObject("process_instance").getString("status");
+            String create_time = jsonObject1.getJSONObject("process_instance").getString("create_time");
+            map.put("create_time",create_time);
             String task_result = jsonObject1.getJSONObject("process_instance").getString("result");
             if (task_result.equals("agree")) {
                 map.put("approve_status","已审批");
@@ -68,6 +69,7 @@ public class JiaBan {
                 if ("START_PROCESS_INSTANCE".equals(operation_type)) {
                     String userid = jsonObject2.getString("userid");
                     map.put("userid", userid);
+
                     JSONArray form_component_values = jsonObject1.getJSONObject("process_instance").getJSONArray("form_component_values");
                     for (int m = 0; m < form_component_values.size(); m++) {
                         JSONObject jsonObject3 = form_component_values.getJSONObject(m);
@@ -123,6 +125,7 @@ public class JiaBan {
             String jsonString = JSON.toJSONString(map);
             Gson gson = new Gson();
             JBModel model = gson.fromJson(jsonString, JBModel.class);
+            System.out.println(model);
             writeMysql("SC_KQ_JB", model, props);
         }
     }

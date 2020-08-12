@@ -39,7 +39,7 @@ public class MainUntils {
         return mapStream.split((OutputSelector<DataStruct>) event -> {
             List<String> output = new ArrayList<>();
             String type = event.getSystem_name();
-            if ("101_100".equals(type) | "107_107".equals(type)) {
+            if ("101_100".equals(type) || "107_107".equals(type)) {
                 output.add("Win");
             } else if ("101_101".equals(type)) {
                 output.add("Linux");

@@ -17,7 +17,7 @@ public class MySQLUtils {
             String host = props.get(PropertiesConstants.MYSQL_HOST).toString().trim();
             String port = props.get(PropertiesConstants.MYSQL_PORT).toString().trim();
             String database = props.get(PropertiesConstants.MYSQL_DATABASE).toString().trim();
-            String mysqlUrl = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useUnicode=true&characterEncoding=UTF-8";
+            String mysqlUrl = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useUnicode=true&characterEncoding=UTF-8&useSSL=false";
             connection = DriverManager.getConnection(mysqlUrl, userName, passWord);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();

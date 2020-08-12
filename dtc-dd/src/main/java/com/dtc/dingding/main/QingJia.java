@@ -29,9 +29,10 @@ public class QingJia {
         OapiProcessinstanceListidsRequest req = new OapiProcessinstanceListidsRequest();
         req.setProcessCode(props.get(PropertiesConstants.DD_QINGJIA).toString());
         Map<String, String> time = getTime();
-        Long stattime = Long.parseLong(time.get("starttime"));
+        Long starttime = Long.parseLong(time.get("starttime"));
         Long endtime = Long.parseLong(time.get("endtime"));
-        req.setStartTime(stattime);
+
+        req.setStartTime(starttime);
         req.setEndTime(endtime);
         OapiProcessinstanceListidsResponse response = client.execute(req, access_token);
         String str = response.getBody();

@@ -12,6 +12,7 @@ import com.dtc.dingding.model.UserIdModel;
 import com.google.gson.Gson;
 import com.taobao.api.ApiException;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -80,6 +81,7 @@ public class DingUtils {
             JSONObject jsonObject = JSONObject.parseObject(body);
             if (!(jsonObject.getJSONArray("userlist").size() == 0)) {
                 JSONArray userlist = jsonObject.getJSONArray("userlist");
+                System.out.println("list size:" + userlist.size());
                 for (int i = 0; i < userlist.size(); i++) {
                     JSONObject job = userlist.getJSONObject(i);
                     String userID = job.get("userid").toString();
@@ -89,6 +91,11 @@ public class DingUtils {
 
                     Gson gson = new Gson();
                     UserModel userModel = gson.fromJson(userInfo, UserModel.class);
+//                    System.out.println(userModel);
+
+                    DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+//                    String daka = format.format(stime);
+
                     SinkUtils.writeMysql("SC_KQ_USER", userModel, props);
                 }
             }
@@ -165,6 +172,10 @@ public class DingUtils {
         Map<String, String> time = getTime();
         String startTime = time.get("starttime");
         String endTime = time.get("endtime");
+
+//        String startTime = String.valueOf(stime);
+//        String endTime = String.valueOf(etime);
+
         String start = timeStamp2Date(startTime, "yyyy-MM-dd HH:mm:ss");
         String end = timeStamp2Date(endTime, "yyyy-MM-dd HH:mm:ss");
         request.setWorkDateFrom(start);
@@ -186,20 +197,23 @@ public class DingUtils {
         Map<String, String> map = new HashMap();
         try {
             if (recoder.size() >= 2) {
-                JSONObject job1 = recoder.getJSONObject(0);
-                String checkType1 = job1.get("checkType").toString();
-                if (checkType1.equals("OnDuty")) {
-                    map.put(checkType1, job1.get("userCheckTime").toString());
-                } else if (checkType1.equals("OffDuty")) {
-                    map.put(checkType1, job1.get("userCheckTime").toString());
-                }
-
-                JSONObject job2 = recoder.getJSONObject(1);
-                String checkType2 = job2.get("checkType").toString();
-                if (checkType2.equals("OffDuty")) {
-                    map.put(checkType2, job2.get("userCheckTime").toString());
-                } else if (checkType2.equals("OnDuty")) {
-                    map.put(checkType2, job2.get("userCheckTime").toString());
+                String onTime = recoder.getJSONObject(0).get("userCheckTime").toString();
+                String offTime = recoder.getJSONObject(0).get("userCheckTime").toString();
+                for (int i = 0; i < recoder.size(); i++) {
+                    JSONObject job = recoder.getJSONObject(i);
+                    String checkType = job.get("checkType").toString();
+                    String userCheckTime = job.get("userCheckTime").toString();
+                    if (checkType.equals("OnDuty")) {
+                        if (userCheckTime.compareTo(onTime) <= 0) {
+                            onTime = userCheckTime;
+                        }
+                        map.put(checkType,onTime);
+                    } else if (checkType.equals("OffDuty")){
+                        if (userCheckTime.compareTo(offTime) >= 0) {
+                            offTime = userCheckTime;
+                        }
+                        map.put(checkType,offTime);
+                    }
                 }
             } else if (recoder.size() == 1) {
                 JSONObject job = recoder.getJSONObject(0);
@@ -218,6 +232,7 @@ public class DingUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+//        System.out.println(map);
         return map;
     }
 

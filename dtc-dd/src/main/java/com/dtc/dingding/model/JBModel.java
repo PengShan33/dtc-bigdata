@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JBModel extends SuperModel{
+    @SerializedName(value="create_time")
+    String createTime;
     @SerializedName(value="jiaban_time")
     String time;
     @SerializedName("start_time")

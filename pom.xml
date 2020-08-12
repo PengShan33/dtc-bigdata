@@ -15,6 +15,7 @@
         <module>dtc-dd-data</module>
         <module>dtc-flink-log</module>
         <module>dtc-dd</module>
+        <module>dtc-flink-prometheus</module>
         <module>dtc-dist</module>
     </modules>
     <properties>

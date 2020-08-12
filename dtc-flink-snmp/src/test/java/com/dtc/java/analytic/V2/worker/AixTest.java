@@ -37,14 +37,14 @@ public class AixTest {
         consumer.setStartFromLatest();
         DataStreamSource<SourceEvent> aixSourceStream = env.addSource(consumer);
 
-//        aixSourceStream.print();
+        aixSourceStream.print();
 
         SingleOutputStreamOperator<DataStruct> aixMapStream = aixSourceStream.map(new MainUntils.MyMapFunctionV3());
         aixMapStream.map(new AixMapFunction())
                     .keyBy("Host")
                     .timeWindow(Time.seconds(10))
-                    .process(new AixProcessMapFunction())
-                    .print();
+                    .process(new AixProcessMapFunction());
+//                    .print();
 
 //        aixMapStream.print();
 
