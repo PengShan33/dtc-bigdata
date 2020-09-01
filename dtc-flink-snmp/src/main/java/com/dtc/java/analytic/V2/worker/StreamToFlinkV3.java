@@ -142,6 +142,9 @@ public class StreamToFlinkV3 {
 
         // aix指标数据写入opentsdb
         aixProcess.addSink(new PSinkToOpentsdb(opentsdb_url));
+        //aix数据进行告警规则判断并将告警数据写入mysql
+        List<DataStream<AlterStruct>> alarmLinux = getAlarm(aixProcess, broadcast, build);
+        alarmLinux.forEach(e -> e.addSink(new MysqlSink()));
     }
 
     private static void H3c_Data_Process(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, ParameterTool parameterTool, TimesConstats build) {
@@ -306,4 +309,5 @@ public class StreamToFlinkV3 {
             return map;
         }
     }
+
 }
