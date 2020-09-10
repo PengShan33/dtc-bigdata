@@ -2,6 +2,7 @@ package com.dtc.java.analytic.V2.process.function;
 
 import com.dtc.java.analytic.V2.common.model.DataStruct;
 import com.dtc.java.analytic.V2.enums.CodeTypeEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
@@ -84,6 +85,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
 
     @Override
     public void process(Tuple tuple, Context context, Iterable<DataStruct> elements, Collector<DataStruct> out) throws Exception {
+
         for (DataStruct element : elements) {
             /**
              * 系统启动时间,暂时不做处理
@@ -96,7 +98,14 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
              * cpu使用率,直接使用
              */
             if (CodeTypeEnum.AIX_SECPU_UTILIZATION.getCode().equals(element.getZbFourName())) {
-                out.collect(element);
+                String cpuUsedRate;
+                String value = element.getValue();
+                if (StringUtils.isEmpty(value)) {
+                    cpuUsedRate = "0";
+                } else {
+                    cpuUsedRate = String.valueOf(Double.parseDouble(value) * 100);
+                }
+                out.collect(new DataStruct(element.getSystem_name(), element.getHost(), element.getZbFourName(), element.getZbLastCode(), element.getNameCN(), element.getNameEN(), element.getTime(), cpuUsedRate));
                 continue;
             }
 
@@ -465,7 +474,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
             for (String key2 : diskFreeBlockSize.keySet()) {
                 diskFreeSize += Double.parseDouble(diskFreeBlockSize.get(key2));
             }
-            diskUsedRate = 1 - diskFreeSize / diskSize;
+            diskUsedRate = 100 - diskFreeSize / diskSize * 100;
             String value = String.valueOf(diskUsedRate);
             out.collect(new DataStruct(systemName, host, zbFourName, zbLastCode, nameCn, nameEn, time, value));
             diskBlockSize.clear();
@@ -499,7 +508,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 usedSize = usedSize + size * usedNum / bytes2GbUnit;
             }
 
-            double memUsedRate = usedSize / memTotalSize;
+            double memUsedRate = usedSize / memTotalSize * 100;
             String value = String.valueOf(memUsedRate);
 
             out.collect(new DataStruct(systemName, host, zbFourName, zbLastCode, chineseName, englishName, time, value));
