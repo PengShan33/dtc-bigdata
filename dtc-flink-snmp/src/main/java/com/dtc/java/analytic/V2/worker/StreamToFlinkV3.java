@@ -11,6 +11,7 @@ import com.dtc.java.analytic.V2.map.function.*;
 import com.dtc.java.analytic.V2.process.function.*;
 import com.dtc.java.analytic.V2.sink.mysql.MysqlSink;
 import com.dtc.java.analytic.V2.sink.opentsdb.PSinkToOpentsdb;
+import com.dtc.java.analytic.V2.sink.redis.RedisWriter;
 import com.dtc.java.analytic.V2.sink.redis.SinkToRedis;
 import com.dtc.java.analytic.V2.source.mysql.ReadAlarmMessage;
 import com.google.common.base.Charsets;
@@ -58,7 +59,7 @@ public class StreamToFlinkV3 {
                 BasicTypeInfo.STRING_TYPE_INFO);
         ParameterTool parameterTool = ExecutionEnvUtil.createParameterTool(args);
         String opentsdb_url = parameterTool.get(PropertiesConstants.OPENTSDB_URL, "http://10.3.7.231:4399").trim();
-        int windowSizeMillis = parameterTool.getInt(PropertiesConstants.WINDOWS_SIZE, 10*1000);
+        int windowSizeMillis = parameterTool.getInt(PropertiesConstants.WINDOWS_SIZE, 10 * 1000);
         TimesConstats build = getSize(parameterTool);
         StreamExecutionEnvironment env = ExecutionEnvUtil.prepare(parameterTool);
         env.getConfig().setGlobalJobParameters(parameterTool);
@@ -108,13 +109,14 @@ public class StreamToFlinkV3 {
 
         //windows数据进行告警规则判断并将告警数据写入mysql
         List<DataStream<AlterStruct>> alarmWindows = getAlarm(winProcess, broadcast, build);
-//        alarmWindows.forEach(e-> {
-//            SingleOutputStreamOperator<AlterStruct> process = e.keyBy("gaojing")
-//                    .timeWindow(Time.of(windowSizeMillis, TimeUnit.MILLISECONDS))
-//                    .process(new alarmConvergence());
-//        });
+       /* alarmWindows.forEach(e-> {
+            SingleOutputStreamOperator<AlterStruct> process = e.keyBy("gaojing")
+                    .timeWindow(Time.of(windowSizeMillis, TimeUnit.MILLISECONDS))
+                    .process(new alarmConvergence());
+        });*/
 
-        alarmWindows.forEach(e -> e.addSink(new MysqlSink()));
+        //alarmWindows.forEach(e -> e.addSink(new MysqlSink()));
+        alarmWindows.forEach(alarmDataStream -> alarmDataStream.addSink(new RedisWriter()));
     }
 
     private static void Linux_Data_Process(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, TimesConstats build) {
@@ -129,7 +131,14 @@ public class StreamToFlinkV3 {
         linuxProcess.addSink(new PSinkToOpentsdb(opentsdb_url));
         //Linux数据进行告警规则判断并将告警数据写入mysql
         List<DataStream<AlterStruct>> alarmLinux = getAlarm(linuxProcess, broadcast, build);
-        alarmLinux.forEach(e -> e.addSink(new MysqlSink()));
+
+       /* alarmLinux.forEach(e-> {
+            SingleOutputStreamOperator<AlterStruct> process = e.keyBy("gaojing")
+                    .timeWindow(Time.of(windowSizeMillis, TimeUnit.MILLISECONDS))
+                    .process(new alarmConvergence());
+        });*/
+        //alarmList.forEach(e -> e.addSink(new MysqlSink()));
+        alarmLinux.forEach(alarmDataStream -> alarmDataStream.addSink(new RedisWriter()));
     }
 
     private static void Aix_Data_Process(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, TimesConstats build) {
@@ -144,7 +153,8 @@ public class StreamToFlinkV3 {
         aixProcess.addSink(new PSinkToOpentsdb(opentsdb_url));
         //aix数据进行告警规则判断并将告警数据写入mysql
         List<DataStream<AlterStruct>> alarmLinux = getAlarm(aixProcess, broadcast, build);
-        alarmLinux.forEach(e -> e.addSink(new MysqlSink()));
+        //alarmLinux.forEach(e -> e.addSink(new MysqlSink()));
+        alarmLinux.forEach(alarmDataStream -> alarmDataStream.addSink(new RedisWriter()));
     }
 
     private static void H3c_Data_Process(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, ParameterTool parameterTool, TimesConstats build) {
@@ -190,7 +200,8 @@ public class StreamToFlinkV3 {
         H3C_Switch.addSink(new PSinkToOpentsdb(opentsdb_url));
         //Linux数据进行告警规则判断并将告警数据写入mysql
         List<DataStream<AlterStruct>> H3C_Switch_1 = getAlarm(H3C_Switch, broadcast, build);
-        H3C_Switch_1.forEach(e -> e.addSink(new MysqlSink()));
+        //H3C_Switch_1.forEach(e -> e.addSink(new MysqlSink()));
+        H3C_Switch_1.forEach(alarmDataStream -> alarmDataStream.addSink(new RedisWriter()));
     }
 
     private static void ZX_Data_Process(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, ParameterTool parameterTool, TimesConstats build) {
@@ -237,7 +248,8 @@ public class StreamToFlinkV3 {
         ZX_Switch.addSink(new PSinkToOpentsdb(opentsdb_url));
         //Linux数据进行告警规则判断并将告警数据写入mysql
         List<DataStream<AlterStruct>> H3C_Switch_1 = getAlarm(ZX_Switch, broadcast, build);
-        H3C_Switch_1.forEach(e -> e.addSink(new MysqlSink()));
+        //H3C_Switch_1.forEach(e -> e.addSink(new MysqlSink()));
+        H3C_Switch_1.forEach(alarmDataStream -> alarmDataStream.addSink(new RedisWriter()));
     }
 
     private static void DPI_Data_Process(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, ParameterTool parameterTool, TimesConstats build) {
@@ -282,7 +294,8 @@ public class StreamToFlinkV3 {
         DPI_Switch.addSink(new PSinkToOpentsdb(opentsdb_url));
         //Linux数据进行告警规则判断并将告警数据写入mysql
         List<DataStream<AlterStruct>> H3C_Switch_1 = getAlarm(DPI_Switch, broadcast, build);
-        H3C_Switch_1.forEach(e -> e.addSink(new MysqlSink()));
+        //H3C_Switch_1.forEach(e -> e.addSink(new MysqlSink()));
+        H3C_Switch_1.forEach(alarmDataStream -> alarmDataStream.addSink(new RedisWriter()));
     }
 
     static class MySQLFunction implements MapFunction<Map<String, Tuple9<String, String, String, Double, Double, Double, Double, String, String>>, Map<String, String>> {

@@ -9,6 +9,7 @@ package com.dtc.java.analytic.V2.alarm;
 import com.dtc.java.analytic.V2.common.model.AlterStruct;
 import com.dtc.java.analytic.V2.common.model.DataStruct;
 import com.dtc.java.analytic.V2.common.model.TimesConstats;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.state.BroadcastState;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.state.ReadOnlyBroadcastState;
@@ -26,6 +27,7 @@ import java.util.Map;
  * Created on : 2020-05-22
  * @Description : TODO描述类作用
  */
+@Slf4j
 public class PingAlarmUntils {
     public static DataStream<AlterStruct> getAlarmPing(SingleOutputStreamOperator<DataStruct> event, BroadcastStream<Map<String, String>> broadcast, TimesConstats test) {
 
@@ -93,6 +95,7 @@ public class PingAlarmUntils {
      * 告警规则
      */
     public static void AlarmRule1(DataStruct value, Collector<AlterStruct> out, String unique_id, String[] split1, String str1) {
+
         double data_value = Double.parseDouble(value.getValue());
         String code_name = str1;
         String level_1 = split1[0];

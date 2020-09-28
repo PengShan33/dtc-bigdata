@@ -50,7 +50,7 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
 
         for (DataStruct in : elements) {
             //判断数据类型是否是数值型
-            boolean strResult = in.getValue().matches("-?[0-9]+.*[0-9]*");
+            boolean strResult = in.getValue().matches("(^-?[0-9][0-9]*(.[0-9]+)?)$");
             if (!strResult) {
                 log.info("value is not number of string!" + in.getValue());
                 //TODO 若数据不是数值型，可以将数据存到hbse中，例如时间

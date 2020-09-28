@@ -15,7 +15,7 @@ if [ -z "${LOG_DIR}" ];then
 fi
 
 if [ -z "${FM_CONF_DIR}" ] || [ ! -d "${FM_CONF_DIR}" ];then
-    FM_CONF_DIR=${FM_HOME}/conf
+    FM_CONF_DIR=${FM_HOME}/bin
 fi
 export FM_CONF_DIRF
 

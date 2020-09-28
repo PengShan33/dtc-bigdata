@@ -4,7 +4,6 @@ export HADOOP_USER_NAME="dtc"
 export CONF_FILE="conf.properties"
 export PLUGINS_DIRS=${FM_HOME}/plugins
 export NATIVE_DIR=${FM_HOME}/native
-#export FM_USER=hadoop
 export LOG_DIR=${FM_HOME}/logs
 
 # defaults
