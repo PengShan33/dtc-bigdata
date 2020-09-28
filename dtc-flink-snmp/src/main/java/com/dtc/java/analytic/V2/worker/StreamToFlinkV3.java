@@ -58,7 +58,7 @@ public class StreamToFlinkV3 {
                 BasicTypeInfo.STRING_TYPE_INFO,
                 BasicTypeInfo.STRING_TYPE_INFO);
         ParameterTool parameterTool = ExecutionEnvUtil.createParameterTool(args);
-        String opentsdb_url = parameterTool.get(PropertiesConstants.OPENTSDB_URL, "http://10.3.7.231:4399").trim();
+        String opentsdb_url = parameterTool.get(PropertiesConstants.OPENTSDB_URL, "http://10.10.76.58:4399").trim();
         int windowSizeMillis = parameterTool.getInt(PropertiesConstants.WINDOWS_SIZE, 10 * 1000);
         TimesConstats build = getSize(parameterTool);
         StreamExecutionEnvironment env = ExecutionEnvUtil.prepare(parameterTool);
@@ -109,13 +109,7 @@ public class StreamToFlinkV3 {
 
         //windows数据进行告警规则判断并将告警数据写入mysql
         List<DataStream<AlterStruct>> alarmWindows = getAlarm(winProcess, broadcast, build);
-       /* alarmWindows.forEach(e-> {
-            SingleOutputStreamOperator<AlterStruct> process = e.keyBy("gaojing")
-                    .timeWindow(Time.of(windowSizeMillis, TimeUnit.MILLISECONDS))
-                    .process(new alarmConvergence());
-        });*/
 
-        //alarmWindows.forEach(e -> e.addSink(new MysqlSink()));
         alarmWindows.forEach(alarmDataStream -> alarmDataStream.addSink(new RedisWriter()));
     }
 
@@ -132,12 +126,6 @@ public class StreamToFlinkV3 {
         //Linux数据进行告警规则判断并将告警数据写入mysql
         List<DataStream<AlterStruct>> alarmLinux = getAlarm(linuxProcess, broadcast, build);
 
-       /* alarmLinux.forEach(e-> {
-            SingleOutputStreamOperator<AlterStruct> process = e.keyBy("gaojing")
-                    .timeWindow(Time.of(windowSizeMillis, TimeUnit.MILLISECONDS))
-                    .process(new alarmConvergence());
-        });*/
-        //alarmList.forEach(e -> e.addSink(new MysqlSink()));
         alarmLinux.forEach(alarmDataStream -> alarmDataStream.addSink(new RedisWriter()));
     }
 
@@ -165,23 +153,7 @@ public class StreamToFlinkV3 {
                 .keyBy("Host")
                 .timeWindow(Time.of(windowSizeMillis, TimeUnit.MILLISECONDS))
                 .process(new H3CSwitchProcessMapFunction());
-//        H3C_Switch.map(new MapFunction<DataStruct, Object>() {
-//            @Override
-//            public Object map(DataStruct string) throws Exception {
-//                String demo = string.getHost() + "_" + string.getZbFourName() + "_" + string.getZbLastCode();
-//                if (!bf.mightContain(demo)) {
-//                    if ("102_101_101_101_101".equals(string.getZbFourName())) {
-//                        bf.put(demo);
-//                        writeEventToHbase(string, parameterTool, "1");
-//                    }
-//                    if ("102_101_103_107_108".equals(string.getZbFourName())) {
-//                        bf.put(demo);
-//                        writeEventToHbase(string, parameterTool, "2");
-//                    }
-//                }
-//                return string;
-//            }
-//        });
+
         //板卡等信息写入到redis中
         H3C_Switch.flatMap(new FlatMapFunction<DataStruct, Tuple3<String, String, String>>() {
             @Override
@@ -212,24 +184,7 @@ public class StreamToFlinkV3 {
                 .keyBy("Host")
                 .timeWindow(Time.of(windowSizeMillis, TimeUnit.MILLISECONDS))
                 .process(new ZXSwitchProcessMapFunction());
-        //板卡等信息数据写hbase中
-//        ZX_Switch.map(new MapFunction<DataStruct, Object>() {
-//            @Override
-//            public Object map(DataStruct string) throws Exception {
-//                String demo = string.getHost() + "_" + string.getZbFourName() + "_" + string.getZbLastCode();
-//                if (!bf.mightContain(demo)) {
-//                    if ("102_103_101_101_101".equals(string.getZbFourName())) {
-//                        bf.put(demo);
-//                        writeEventToHbase(string, parameterTool, "1");
-//                    }
-//                    if ("102_103_103_105_105".equals(string.getZbFourName())) {
-//                        bf.put(demo);
-//                        writeEventToHbase(string, parameterTool, "2");
-//                    }
-//                }
-//                return string;
-//            }
-//        });
+
         //板卡等信息写入到redis中
         ZX_Switch.flatMap(new FlatMapFunction<DataStruct, Tuple3<String, String, String>>() {
             @Override
@@ -260,23 +215,6 @@ public class StreamToFlinkV3 {
                 .keyBy("Host")
                 .timeWindow(Time.of(windowSizeMillis, TimeUnit.MILLISECONDS))
                 .process(new DPISwitchProcessMapFunction());
-//        DPI_Switch.map(new MapFunction<DataStruct, Object>() {
-//            @Override
-//            public Object map(DataStruct string) throws Exception {
-//                String demo = string.getHost() + "_" + string.getZbFourName() + "_" + string.getZbLastCode();
-//                if (!bf.mightContain(demo)) {
-//                    if ("103_102_101_101_101".equals(string.getZbFourName())) {
-//                        bf.put(demo);
-//                        writeEventToHbase(string, parameterTool, "1");
-//                    }
-//                    if ("103_102_103_107_107_1".equals(string.getZbFourName())) {
-//                        bf.put(demo);
-//                        writeEventToHbase(string, parameterTool, "2");
-//                    }
-//                }
-//                return string;
-//            }
-//        });
 
         DPI_Switch.flatMap(new FlatMapFunction<DataStruct, Tuple3<String, String, String>>() {
             @Override

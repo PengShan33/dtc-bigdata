@@ -103,7 +103,5 @@ public class KafkaConfigUtil {
         return partitionOffset;
     }
 
-//    public static SingleOutputStreamOperator<MetricEvent> parseSource(DataStreamSource<MetricEvent> dataStreamSource) {
-//        return dataStreamSource.assignTimestampsAndWatermarks(new MetricWatermark());
-//    }
+
 }

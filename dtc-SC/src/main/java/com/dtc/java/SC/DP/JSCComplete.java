@@ -1,11 +1,12 @@
 package com.dtc.java.SC.DP;
 
 import com.dtc.java.SC.JKZL.ExecutionEnvUtil;
-
 import com.dtc.java.SC.JSC.model.ModelFirst;
 import com.dtc.java.SC.JSC.model.ModelSecond;
 import com.dtc.java.SC.JSC.model.ModelThree;
-import com.dtc.java.SC.JSC.sink.*;
+import com.dtc.java.SC.JSC.sink.MysqlSinkJSC;
+import com.dtc.java.SC.JSC.sink.MysqlSinkJSC_TOP;
+import com.dtc.java.SC.JSC.sink.MysqlSinkJSC_YC;
 import com.dtc.java.SC.JSC.source.*;
 import com.dtc.java.SC.common.PropertiesConstants;
 import lombok.extern.slf4j.Slf4j;

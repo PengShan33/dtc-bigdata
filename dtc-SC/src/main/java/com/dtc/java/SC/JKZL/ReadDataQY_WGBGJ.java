@@ -1,8 +1,8 @@
 package com.dtc.java.SC.JKZL;
 
 
-import com.dtc.java.SC.common.MySQLUtil;
 import com.dtc.java.SC.JKZL.model.ZongShu;
+import com.dtc.java.SC.common.MySQLUtil;
 import com.dtc.java.SC.common.PropertiesConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.java.tuple.Tuple4;

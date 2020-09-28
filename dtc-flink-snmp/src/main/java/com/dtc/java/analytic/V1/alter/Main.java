@@ -154,24 +154,6 @@ public class Main {
 //
         alarmStream.print("alater message.....");
 
-
-//        SingleOutputStreamOperator<MetricEvent> filter = alert.filter(e -> {
-//            String desc = e.getTags().get("desc");
-//            log.info("10**************"+desc);
-//            if (desc.equals("usb插入")) {
-//                return false;
-//            }else {
-//                return true;
-//            }
-//        });
-//        filter.map(e->e.getName()).print("finally");
-//
-//        //其他的业务逻辑
-//        //alert.
-//
-//        //然后在下游的算子中有使用到 alarmNotifyMap 中的配置信息
-
-
         env.execute("zhisheng broadcast demo");
     }
 

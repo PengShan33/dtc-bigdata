@@ -1,7 +1,7 @@
 package com.dtc.java.SC.JKZL.sink;
 
-import com.dtc.java.SC.common.PropertiesConstants;
 import com.dtc.java.SC.JKZL.model.RoomResultModel;
+import com.dtc.java.SC.common.PropertiesConstants;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 

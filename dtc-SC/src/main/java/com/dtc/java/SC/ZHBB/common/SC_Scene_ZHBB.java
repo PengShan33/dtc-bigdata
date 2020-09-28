@@ -7,7 +7,6 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.io.jdbc.JDBCInputFormat;
 import org.apache.flink.api.java.io.jdbc.JDBCOutputFormat;
-import org.apache.flink.api.java.operators.CoGroupOperator;
 import org.apache.flink.api.java.operators.DataSource;
 import org.apache.flink.api.java.operators.MapOperator;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;

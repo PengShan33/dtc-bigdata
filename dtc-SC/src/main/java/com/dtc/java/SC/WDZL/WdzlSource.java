@@ -5,9 +5,11 @@ import com.dtc.java.SC.common.PropertiesConstants;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.*;
 
 /*
