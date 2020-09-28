@@ -170,209 +170,213 @@ public class AlarmUntils {
      */
     public static void AlarmRule(DataStruct value, Collector<AlterStruct> out, String unique_id, String[] split1, String str1) {
 
-        double data_value = Double.parseDouble(value.getValue());
-        String code_name = str1;
-        String level_1 = split1[0];
-        String level_2 = split1[1];
-        String level_3 = split1[2];
-        String level_4 = split1[3];
-        //四个阈值都不为空
-        if (!("null".equals(level_1)) && !("null".equals(level_2)) && !("null".equals(level_3)) && !("null".equals(level_4))) {
-            Double num_1 = Double.parseDouble(split1[0]);
-            Double num_2 = Double.parseDouble(split1[1]);
-            Double num_3 = Double.parseDouble(split1[2]);
-            Double num_4 = Double.parseDouble(split1[3]);
-            if ((data_value > num_1 || data_value == num_1) && data_value < num_2) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if ((data_value > num_2 || data_value == num_2) && data_value < num_3) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "2", unique_id, String.valueOf(num_2), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if ((data_value > num_3 || data_value == num_3) && data_value < num_4) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "3", unique_id, String.valueOf(num_3), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if (data_value > num_4 || data_value == num_4) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "4", unique_id, String.valueOf(num_4), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
+        try {
+            double data_value = Double.parseDouble(value.getValue());
+            String code_name = str1;
+            String level_1 = split1[0];
+            String level_2 = split1[1];
+            String level_3 = split1[2];
+            String level_4 = split1[3];
+            //四个阈值都不为空
+            if (!("null".equals(level_1)) && !("null".equals(level_2)) && !("null".equals(level_3)) && !("null".equals(level_4))) {
+                Double num_1 = Double.parseDouble(split1[0]);
+                Double num_2 = Double.parseDouble(split1[1]);
+                Double num_3 = Double.parseDouble(split1[2]);
+                Double num_4 = Double.parseDouble(split1[3]);
+                if ((data_value > num_1 || data_value == num_1) && data_value < num_2) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if ((data_value > num_2 || data_value == num_2) && data_value < num_3) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "2", unique_id, String.valueOf(num_2), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if ((data_value > num_3 || data_value == num_3) && data_value < num_4) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "3", unique_id, String.valueOf(num_3), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if (data_value > num_4 || data_value == num_4) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "4", unique_id, String.valueOf(num_4), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                }
             }
-        }
-        //一个不为空，其他的都为空
-        else if (!("null".equals(level_1)) && "null".equals(level_2) && "null".equals(level_3) && "null".equals(level_4)) {
-            Double num_1 = Double.parseDouble(split1[0]);
-            if ((data_value > num_1 || data_value == num_1)) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
+            //一个不为空，其他的都为空
+            else if (!("null".equals(level_1)) && "null".equals(level_2) && "null".equals(level_3) && "null".equals(level_4)) {
+                Double num_1 = Double.parseDouble(split1[0]);
+                if ((data_value > num_1 || data_value == num_1)) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                }
+            } else if ("null".equals(level_1) && !("null".equals(level_2)) && "null".equals(level_3) && "null".equals(level_4)) {
+                Double num_2 = Double.parseDouble(split1[1]);
+                if ((data_value > num_2 || data_value == num_2)) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "2", unique_id, String.valueOf(num_2), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                }
+            } else if ("null".equals(level_1) && "null".equals(level_2) && !("null".equals(level_3)) && "null".equals(level_4)) {
+                Double num_3 = Double.parseDouble(split1[2]);
+                if ((data_value > num_3 || data_value == num_3)) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "3", unique_id, String.valueOf(num_3), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                }
+            } else if ("null".equals(level_1) && "null".equals(level_2) && "null".equals(level_3) && !("null".equals(level_4))) {
+                Double num_4 = Double.parseDouble(split1[3]);
+                if ((data_value > num_4 || data_value == num_4)) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "4", unique_id, String.valueOf(num_4), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                }
             }
-        } else if ("null".equals(level_1) && !("null".equals(level_2)) && "null".equals(level_3) && "null".equals(level_4)) {
-            Double num_2 = Double.parseDouble(split1[1]);
-            if ((data_value > num_2 || data_value == num_2)) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "2", unique_id, String.valueOf(num_2), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
+            //两个为空，两个不为空
+            else if (!("null".equals(level_1)) && !("null".equals(level_2)) && "null".equals(level_3) && "null".equals(level_4)) {
+                Double num_1 = Double.parseDouble(split1[0]);
+                Double num_2 = Double.parseDouble(split1[1]);
+                if ((data_value > num_1 || data_value == num_1) && (data_value < num_2)) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if ((data_value > num_2 || data_value == num_2)) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "2", unique_id, String.valueOf(num_2), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                }
+            } else if (!("null".equals(level_1)) && !("null".equals(level_3)) && "null".equals(level_2) && "null".equals(level_4)) {
+                Double num_1 = Double.parseDouble(split1[0]);
+                Double num_3 = Double.parseDouble(split1[2]);
+                if ((data_value > num_1 || data_value == num_1) && (data_value < num_3)) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if ((data_value > num_3 || data_value == num_3)) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "3", unique_id, String.valueOf(num_3), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                }
+            } else if (!("null".equals(level_1)) && !("null".equals(level_4)) && "null".equals(level_2) && "null".equals(level_3)) {
+                Double num_1 = Double.parseDouble(split1[0]);
+                Double num_4 = Double.parseDouble(split1[3]);
+                if ((data_value > num_1 || data_value == num_1) && (data_value < num_4)) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if ((data_value > num_4 || data_value == num_4)) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "4", unique_id, String.valueOf(num_4), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                }
+            } else if (!("null".equals(level_2)) && !("null".equals(level_3)) && "null".equals(level_1) && "null".equals(level_4)) {
+                Double num_3 = Double.parseDouble(split1[2]);
+                Double num_2 = Double.parseDouble(split1[1]);
+                if ((data_value > num_2 || data_value == num_2) && (data_value < num_3)) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "2", unique_id, String.valueOf(num_2), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if ((data_value > num_3 || data_value == num_3)) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "3", unique_id, String.valueOf(num_3), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                }
+            } else if (!("null".equals(level_2)) && !("null".equals(level_4)) && "null".equals(level_1) && "null".equals(level_3)) {
+                Double num_4 = Double.parseDouble(split1[3]);
+                Double num_2 = Double.parseDouble(split1[1]);
+                if ((data_value > num_2 || data_value == num_2) && (data_value < num_4)) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "2", unique_id, String.valueOf(num_2), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if ((data_value > num_4 || data_value == num_4)) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "4", unique_id, String.valueOf(num_4), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                }
+            } else if (!("null".equals(level_3)) && !("null".equals(level_4)) && "null".equals(level_1) && "null".equals(level_2)) {
+                Double num_4 = Double.parseDouble(split1[3]);
+                Double num_3 = Double.parseDouble(split1[2]);
+                if ((data_value > num_3 || data_value == num_3) && (data_value < num_4)) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "3", unique_id, String.valueOf(num_3), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if ((data_value > num_4 || data_value == num_4)) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "4", unique_id, String.valueOf(num_4), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                }
             }
-        } else if ("null".equals(level_1) && "null".equals(level_2) && !("null".equals(level_3)) && "null".equals(level_4)) {
-            Double num_3 = Double.parseDouble(split1[2]);
-            if ((data_value > num_3 || data_value == num_3)) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "3", unique_id, String.valueOf(num_3), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
+            //三不空，一空
+            else if (!("null".equals(level_1)) && !("null".equals(level_2)) && !("null".equals(level_3)) && "null".equals(level_4)) {
+                Double num_1 = Double.parseDouble(split1[0]);
+                Double num_2 = Double.parseDouble(split1[1]);
+                Double num_3 = Double.parseDouble(split1[2]);
+                if ((data_value > num_1 || data_value == num_1) && data_value < num_2) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if ((data_value > num_2 || data_value == num_2) && data_value < num_3) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "2", unique_id, String.valueOf(num_2), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if (data_value > num_3 || data_value == num_3) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "3", unique_id, String.valueOf(num_3), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                }
+            } else if (!("null".equals(level_1)) && !("null".equals(level_2)) && !("null".equals(level_4)) && "null".equals(level_3)) {
+                Double num_1 = Double.parseDouble(split1[0]);
+                Double num_2 = Double.parseDouble(split1[1]);
+                Double num_4 = Double.parseDouble(split1[3]);
+                if ((data_value > num_1 || data_value == num_1) && data_value < num_2) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if ((data_value > num_2 || data_value == num_2) && data_value < num_4) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "2", unique_id, String.valueOf(num_2), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if (data_value > num_4 || data_value == num_4) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "4", unique_id, String.valueOf(num_4), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                }
+            } else if (!("null".equals(level_1)) && !("null".equals(level_3)) && !("null".equals(level_4)) && "null".equals(level_2)) {
+                Double num_1 = Double.parseDouble(split1[0]);
+                Double num_3 = Double.parseDouble(split1[2]);
+                Double num_4 = Double.parseDouble(split1[3]);
+                if ((data_value > num_1 || data_value == num_1) && data_value < num_3) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if ((data_value > num_3 || data_value == num_3) && data_value < num_4) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "3", unique_id, String.valueOf(num_3), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if (data_value > num_4 || data_value == num_4) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "4", unique_id, String.valueOf(num_4), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                }
+            } else if (!("null".equals(level_2)) && !("null".equals(level_3)) && !("null".equals(level_4)) && "null".equals(level_1)) {
+                Double num_2 = Double.parseDouble(split1[1]);
+                Double num_3 = Double.parseDouble(split1[2]);
+                Double num_4 = Double.parseDouble(split1[3]);
+                if ((data_value > num_2 || data_value == num_2) && data_value < num_3) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "2", unique_id, String.valueOf(num_2), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if ((data_value > num_3 || data_value == num_3) && data_value < num_4) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "3", unique_id, String.valueOf(num_3), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                } else if (data_value > num_4 || data_value == num_4) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "4", unique_id, String.valueOf(num_4), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                }
             }
-        } else if ("null".equals(level_1) && "null".equals(level_2) && "null".equals(level_3) && !("null".equals(level_4))) {
-            Double num_4 = Double.parseDouble(split1[3]);
-            if ((data_value > num_4 || data_value == num_4)) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "4", unique_id, String.valueOf(num_4), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            }
-        }
-        //两个为空，两个不为空
-        else if (!("null".equals(level_1)) && !("null".equals(level_2)) && "null".equals(level_3) && "null".equals(level_4)) {
-            Double num_1 = Double.parseDouble(split1[0]);
-            Double num_2 = Double.parseDouble(split1[1]);
-            if ((data_value > num_1 || data_value == num_1) && (data_value < num_2)) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if ((data_value > num_2 || data_value == num_2)) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "2", unique_id, String.valueOf(num_2), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            }
-        } else if (!("null".equals(level_1)) && !("null".equals(level_3)) && "null".equals(level_2) && "null".equals(level_4)) {
-            Double num_1 = Double.parseDouble(split1[0]);
-            Double num_3 = Double.parseDouble(split1[2]);
-            if ((data_value > num_1 || data_value == num_1) && (data_value < num_3)) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if ((data_value > num_3 || data_value == num_3)) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "3", unique_id, String.valueOf(num_3), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            }
-        } else if (!("null".equals(level_1)) && !("null".equals(level_4)) && "null".equals(level_2) && "null".equals(level_3)) {
-            Double num_1 = Double.parseDouble(split1[0]);
-            Double num_4 = Double.parseDouble(split1[3]);
-            if ((data_value > num_1 || data_value == num_1) && (data_value < num_4)) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if ((data_value > num_4 || data_value == num_4)) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "4", unique_id, String.valueOf(num_4), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            }
-        } else if (!("null".equals(level_2)) && !("null".equals(level_3)) && "null".equals(level_1) && "null".equals(level_4)) {
-            Double num_3 = Double.parseDouble(split1[2]);
-            Double num_2 = Double.parseDouble(split1[1]);
-            if ((data_value > num_2 || data_value == num_2) && (data_value < num_3)) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "2", unique_id, String.valueOf(num_2), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if ((data_value > num_3 || data_value == num_3)) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "3", unique_id, String.valueOf(num_3), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            }
-        } else if (!("null".equals(level_2)) && !("null".equals(level_4)) && "null".equals(level_1) && "null".equals(level_3)) {
-            Double num_4 = Double.parseDouble(split1[3]);
-            Double num_2 = Double.parseDouble(split1[1]);
-            if ((data_value > num_2 || data_value == num_2) && (data_value < num_4)) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "2", unique_id, String.valueOf(num_2), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if ((data_value > num_4 || data_value == num_4)) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "4", unique_id, String.valueOf(num_4), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            }
-        } else if (!("null".equals(level_3)) && !("null".equals(level_4)) && "null".equals(level_1) && "null".equals(level_2)) {
-            Double num_4 = Double.parseDouble(split1[3]);
-            Double num_3 = Double.parseDouble(split1[2]);
-            if ((data_value > num_3 || data_value == num_3) && (data_value < num_4)) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "3", unique_id, String.valueOf(num_3), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if ((data_value > num_4 || data_value == num_4)) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "4", unique_id, String.valueOf(num_4), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            }
-        }
-        //三不空，一空
-        else if (!("null".equals(level_1)) && !("null".equals(level_2)) && !("null".equals(level_3)) && "null".equals(level_4)) {
-            Double num_1 = Double.parseDouble(split1[0]);
-            Double num_2 = Double.parseDouble(split1[1]);
-            Double num_3 = Double.parseDouble(split1[2]);
-            if ((data_value > num_1 || data_value == num_1) && data_value < num_2) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if ((data_value > num_2 || data_value == num_2) && data_value < num_3) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "2", unique_id, String.valueOf(num_2), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if (data_value > num_3 || data_value == num_3) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "3", unique_id, String.valueOf(num_3), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            }
-        } else if (!("null".equals(level_1)) && !("null".equals(level_2)) && !("null".equals(level_4)) && "null".equals(level_3)) {
-            Double num_1 = Double.parseDouble(split1[0]);
-            Double num_2 = Double.parseDouble(split1[1]);
-            Double num_4 = Double.parseDouble(split1[3]);
-            if ((data_value > num_1 || data_value == num_1) && data_value < num_2) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if ((data_value > num_2 || data_value == num_2) && data_value < num_4) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "2", unique_id, String.valueOf(num_2), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if (data_value > num_4 || data_value == num_4) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "4", unique_id, String.valueOf(num_4), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            }
-        } else if (!("null".equals(level_1)) && !("null".equals(level_3)) && !("null".equals(level_4)) && "null".equals(level_2)) {
-            Double num_1 = Double.parseDouble(split1[0]);
-            Double num_3 = Double.parseDouble(split1[2]);
-            Double num_4 = Double.parseDouble(split1[3]);
-            if ((data_value > num_1 || data_value == num_1) && data_value < num_3) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if ((data_value > num_3 || data_value == num_3) && data_value < num_4) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "3", unique_id, String.valueOf(num_3), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if (data_value > num_4 || data_value == num_4) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "4", unique_id, String.valueOf(num_4), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            }
-        } else if (!("null".equals(level_2)) && !("null".equals(level_3)) && !("null".equals(level_4)) && "null".equals(level_1)) {
-            Double num_2 = Double.parseDouble(split1[1]);
-            Double num_3 = Double.parseDouble(split1[2]);
-            Double num_4 = Double.parseDouble(split1[3]);
-            if ((data_value > num_2 || data_value == num_2) && data_value < num_3) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "2", unique_id, String.valueOf(num_2), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if ((data_value > num_3 || data_value == num_3) && data_value < num_4) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "3", unique_id, String.valueOf(num_3), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            } else if (data_value > num_4 || data_value == num_4) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "4", unique_id, String.valueOf(num_4), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
-            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
         }
     }
 }

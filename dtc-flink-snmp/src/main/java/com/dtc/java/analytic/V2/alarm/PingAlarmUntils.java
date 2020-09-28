@@ -96,20 +96,24 @@ public class PingAlarmUntils {
      */
     public static void AlarmRule1(DataStruct value, Collector<AlterStruct> out, String unique_id, String[] split1, String str1) {
 
-        double data_value = Double.parseDouble(value.getValue());
-        String code_name = str1;
-        String level_1 = split1[0];
-        String level_2 = split1[1];
-        String level_3 = split1[2];
-        String level_4 = split1[3];
-        //一个不为空，其他的都为空
-        if (!("null".equals(level_1)) && "null".equals(level_2) && "null".equals(level_3) && "null".equals(level_4)) {
-            Double num_1 = Double.parseDouble(split1[0]);
-            if ((data_value < num_1 )) {
-                String system_time = String.valueOf(System.currentTimeMillis());
-                AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
-                out.collect(alter_message);
+        try {
+            double data_value = Double.parseDouble(value.getValue());
+            String code_name = str1;
+            String level_1 = split1[0];
+            String level_2 = split1[1];
+            String level_3 = split1[2];
+            String level_4 = split1[3];
+            //一个不为空，其他的都为空
+            if (!("null".equals(level_1)) && "null".equals(level_2) && "null".equals(level_3) && "null".equals(level_4)) {
+                Double num_1 = Double.parseDouble(split1[0]);
+                if ((data_value < num_1 )) {
+                    String system_time = String.valueOf(System.currentTimeMillis());
+                    AlterStruct alter_message = new AlterStruct(code_name, value.getHost(), value.getZbFourName(), value.getZbLastCode(), value.getNameCN(), value.getNameEN(), value.getTime(), system_time, value.getValue(), "1", unique_id, String.valueOf(num_1), value.getHost() + "-" + value.getZbFourName());
+                    out.collect(alter_message);
+                }
             }
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
         }
     }
 }
