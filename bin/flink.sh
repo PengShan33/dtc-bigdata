@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 #useage:flink.sh flink-log start
-export PATH=/etc:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/java/jdk1.8.0_162/bin
+export PATH=/etc:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/home/dtc/software/java/bin
+source ~/.bash_profile
+
 if [ -z "${FM_HOME}" ];then
     FM_HOME=$(cd `dirname $0`;cd ..; pwd)
 fi

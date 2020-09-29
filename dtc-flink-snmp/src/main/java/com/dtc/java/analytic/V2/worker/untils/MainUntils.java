@@ -114,28 +114,32 @@ public class MainUntils {
             //asset_id, ipv4, strategy_kind, triger_name, number, code, alarm_level, asset_code, name
             Tuple9<String, String, String, Double, Double, Double, Double, String, String> tuple9 = new Tuple9<>();
             Map<String, Tuple9<String, String, String, Double, Double, Double, Double, String, String>> map = new HashMap<>();
-            for (Tuple9<String, String, String, String, Double, String, String, String, String> sourceEvent : iterable) {
-                String asset_id = sourceEvent.f0;
-                String ip = sourceEvent.f1;
-                Double num = sourceEvent.f4;
-                String code = sourceEvent.f5;
-                String level = sourceEvent.f6;
-                tuple9.f0 = asset_id;
-                tuple9.f1 = ip;
-                tuple9.f2 = code;
-                String key = ip + "." + code.replace("_", ".");
-                if ("1".equals(level)) {
-                    tuple9.f3 = num;
-                } else if ("2".equals(level)) {
-                    tuple9.f4 = num;
-                } else if ("3".equals(level)) {
-                    tuple9.f5 = num;
-                } else if ("4".equals(level)) {
-                    tuple9.f6 = num;
+            try {
+                for (Tuple9<String, String, String, String, Double, String, String, String, String> sourceEvent : iterable) {
+                    String asset_id = sourceEvent.f0;
+                    String ip = sourceEvent.f1;
+                    Double num = sourceEvent.f4;
+                    String code = sourceEvent.f5;
+                    String level = sourceEvent.f6;
+                    tuple9.f0 = asset_id;
+                    tuple9.f1 = ip;
+                    tuple9.f2 = code;
+                    String key = ip + "." + code.replace("_", ".");
+                    if ("1".equals(level)) {
+                        tuple9.f3 = num;
+                    } else if ("2".equals(level)) {
+                        tuple9.f4 = num;
+                    } else if ("3".equals(level)) {
+                        tuple9.f5 = num;
+                    } else if ("4".equals(level)) {
+                        tuple9.f6 = num;
+                    }
+                    tuple9.f7 = sourceEvent.f7;
+                    tuple9.f8 = sourceEvent.f8;
+                    map.put(key, tuple9);
                 }
-                tuple9.f7 = sourceEvent.f7;
-                tuple9.f8 = sourceEvent.f8;
-                map.put(key, tuple9);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
             collector.collect(map);
         }
