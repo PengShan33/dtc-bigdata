@@ -35,8 +35,21 @@ public class JSC_ZCGJTJ_YC_Offline extends RichSourceFunction<Tuple2<String,Inte
 
         if (connection != null) {
 //            String sql = "select count(*) as AllNum from asset a where a.room is not null and a.partitions is not null and a.box is not null";
-            String sql = "select ifnull(z.`name`,'其他') as name,sum(num) as num from (select * from (select m.zc_name,m.parent_id as pd,count(*) as num from (select a.asset_id as a_id,c.parent_id,c.`name` as zc_name,b.`status` from asset_category_mapping a \n" +
-                    "left join asset b on a.asset_id=b.id left join asset_category c on c.id = a.asset_category_id where b.`status`='2') m GROUP BY m.zc_name) x left join asset_category y on x.pd = y.id) z group by z.`name`";
+//            String sql = "select ifnull(z.`name`,'其他') as name,sum(num) as num from (select * from (select m.zc_name,m.parent_id as pd,count(*) as num from (select a.asset_id as a_id,c.parent_id,c.`name` as zc_name,b.`status` from asset_category_mapping a \n" +
+//                    "left join asset b on a.asset_id=b.id left join asset_category c on c.id = a.asset_category_id where b.`status`='2') m GROUP BY m.zc_name) x left join asset_category y on x.pd = y.id) z group by z.`name`";
+
+            String sql = "select \n" +
+                    "ifnull(b.name,'其他') as name,\n" +
+                    "count(asset_id) as num\n" +
+                    "from\n" +
+                    "(select asset_id,category_id,parent_category_id from t_assalarm_asset where  item_code = 'online_status' and item_value = 'off' and removed = 0)a\n" +
+                    "left join\n" +
+                    "(\n" +
+                    "\tselect id,name from t_assalarm_asset_category where removed = 0\n" +
+                    ")b\n" +
+                    "on a.parent_category_id = b.id\n" +
+                    "group by b.name \n";
+
             ps = connection.prepareStatement(sql);
         }
     }

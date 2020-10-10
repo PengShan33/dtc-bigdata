@@ -37,8 +37,31 @@ public class DaPing_ZCGJFL_30 extends RichSourceFunction<Tuple3<String,String,In
 
         if (connection != null) {
 
-            String sql = "select ifnull(n.p_name,'其他') as `name`,n.level_id,count(*) as AllNum from (select m.asset_id,m.pd,m.`name` as z_name,m.level_id,y.id,y.parent_id,y.`name` as p_name from (select a.asset_id,c.parent_id as pd,c.`name`,alarm.level_id from asset_category_mapping a left join asset b on a.asset_id=b.id \n" +
-                    "left join asset_category c on c.id = a.asset_category_id left join alarm on alarm.asset_id= a.asset_id and TO_DAYS(alarm.time_occur) = TO_DAYS(NOW())) m left join asset_category y on m.pd=y.id) n group by n.p_name,n.level_id having n.level_id!=\"\"";
+//            String sql = "select ifnull(n.p_name,'其他') as `name`,n.level_id,count(*) as AllNum from (select m.asset_id,m.pd,m.`name` as z_name,m.level_id,y.id,y.parent_id,y.`name` as p_name from (select a.asset_id,c.parent_id as pd,c.`name`,alarm.level_id from asset_category_mapping a left join asset b on a.asset_id=b.id \n" +
+//                    "left join asset_category c on c.id = a.asset_category_id left join alarm on alarm.asset_id= a.asset_id and TO_DAYSAYS(alarm.time_occur) = TO_DAYS(NOW())) m left join asset_category y on m.pd=y.id) n group by n.p_name,n.level_id having n.level_id!=\"\"";
+
+            //资源资产重构
+            String sql = "select ifnull(c.name,'其他') as name,a.level_id,count(1) as AllNum \n" +
+                    "from\n" +
+                    "(\n" +
+                    "select \n" +
+                    "*\n" +
+                    "from\n" +
+                    "alarm\n" +
+                    "where TO_DAYS(now())=TO_DAYS(alarm.time_occur)\n" +
+                    ")a\n" +
+                    "left join\n" +
+                    "(\n" +
+                    "select asset_id,parent_category_id from t_assalarm_asset where removed = 0\n" +
+                    ")b\n" +
+                    "on a.asset_id = b.asset_id\n" +
+                    "left join\n" +
+                    "(\n" +
+                    "select id,name from t_assalarm_asset_category where removed = 0\n" +
+                    ")c\n" +
+                    "on b.parent_category_id = c.id";
+
+
             ps = connection.prepareStatement(sql);
         }
     }

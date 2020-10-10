@@ -36,10 +36,26 @@ public class JSC_ZCGJTJ_YC extends RichSourceFunction<Tuple3<String,Integer,Inte
 
         if (connection != null) {
 //            String sql = "select count(*) as AllNum from asset a where a.room is not null and a.partitions is not null and a.box is not null";
-            String sql = "select ifnull(k.name,'其他') as name,ifnull(l.num,0) as num from asset_category k left join(select j.name,f.num\n" +
-                    "from (select d.asset_id,d.num,d.asset_category_id,e.parent_id\n" +
-                    "from (select b.asset_id,b.num,c.asset_category_id from (select a.asset_id,count(*) as num from alarm a where TO_DAYS(now())=to_days(a.time_occur) group by a.asset_id) b \n" +
-                    "left join asset_category_mapping c on c.asset_id=b.asset_id) d left join asset_category e on e.id = d.asset_category_id) f left join asset_category j on j.id=f.parent_id) l on k.name = l.name where k.parent_id=0";
+//            String sql = "select ifnull(k.name,'其他') as name,ifnull(l.num,0) as num from asset_category k left join(select j.name,f.num\n" +
+//                    "from (select d.asset_id,d.num,d.asset_category_id,e.parent_id\n" +
+//                    "from (select b.asset_id,b.num,c.asset_category_id from (select a.asset_id,count(*) as num from alarm a where TO_DAYS(now())=to_days(a.time_occur) group by a.asset_id) b \n" +
+//                    "left join asset_category_mapping c on c.asset_id=b.asset_id) d left join asset_category e on e.id = d.asset_category_id) f left join asset_category j on j.id=f.parent_id) l on k.name = l.name where k.parent_id=0";
+
+            String sql = "select\n" +
+                    "ifnull(c.name,'其他') as name,\n" +
+                    "count(a.asset_id) as num\n" +
+                    "from\n" +
+                    "(select asset_id from alarm where TO_DAYS(now())=to_days(time_occur) group by asset_id)a\n" +
+                    "left join\n" +
+                    "(select asset_id,category_id,parent_category_id from t_assalarm_asset  where removed = 0 group by asset_id,category_id,parent_category_id)b\n" +
+                    "on a.asset_id = b.asset_id\n" +
+                    "left join\n" +
+                    "(\n" +
+                    "\tselect id,name from t_assalarm_asset_category where removed = 0\n" +
+                    ")c\n" +
+                    "on b.parent_category_id = c.id\n" +
+                    "group by c.name";
+
             ps = connection.prepareStatement(sql);
         }
     }

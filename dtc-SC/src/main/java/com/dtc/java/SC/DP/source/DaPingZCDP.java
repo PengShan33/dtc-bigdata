@@ -37,8 +37,31 @@ public class DaPingZCDP extends RichSourceFunction<Tuple3<String, String, Intege
 
         if (connection != null) {
 //            String sql = "select count(*) as AllNum from asset a where a.room is not null and a.partitions is not null and a.box is not null";
-            String sql = "select ifnull(n.`name`,'其他') as name,ifnull(n.zc_name,'其他') as zc_name,n.num from (select * from (select m.zc_name,m.parent_id as pd,count(*) as num from (select a.asset_id as a_id,c.parent_id,c.`name` as zc_name from asset_category_mapping a \n" +
-                    "left join asset b on a.asset_id=b.id left join asset_category c on c.id = a.asset_category_id) m GROUP BY m.zc_name) x left join asset_category y on x.pd = y.id) n group by n.`name`,n.zc_name";
+//            String sql = "select ifnull(n.`name`,'其他') as name,ifnull(n.zc_name,'其他') as zc_name,n.num from (select * from (select m.zc_name,m.parent_id as pd,count(*) as num from (select a.asset_id as a_id,c.parent_id,c.`name` as zc_name from asset_category_mapping a \n" +
+//                    "left join asset b on a.asset_id=b.id left join asset_category c on c.id = a.asset_category_id) m GROUP BY m.zc_name) x left join asset_category y on x.pd = y.id) n group by n.`name`,n.zc_name";
+           String sql = "select \n" +
+                   "ifnull(c.name,'其他') as name,\n" +
+                   "ifnull(b.name,'其他') as zc_name,\n" +
+                   "count(1) as num\n" +
+                   "from \n" +
+                   "(\n" +
+                   "select asset_id,parent_category_id, category_id from t_assalarm_asset\n" +
+                   "where removed = 0\n" +
+                   "group by asset_id,parent_category_id, category_id \n" +
+                   ")a\n" +
+                   "left join\n" +
+                   "(\n" +
+                   "select id,name from t_assalarm_asset_category where removed = 0\n" +
+                   ")b\n" +
+                   "on a.category_id = b.id\n" +
+                   "left join\n" +
+                   "(\n" +
+                   "select id,name from t_assalarm_asset_category where removed = 0\n" +
+                   ")c\n" +
+                   "on a.parent_category_id = c.id\n" +
+                   "group by c.name,b.name";
+
+
             ps = connection.prepareStatement(sql);
         }
     }

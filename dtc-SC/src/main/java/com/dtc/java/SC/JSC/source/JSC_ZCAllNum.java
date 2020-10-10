@@ -20,7 +20,8 @@ import java.sql.ResultSet;
  * @Description : 驾驶舱监控大盘--设备正常数
  */
 @Slf4j
-public class JSC_ZCAllNum extends RichSourceFunction<Tuple2<Integer,Integer>> {
+public class
+JSC_ZCAllNum extends RichSourceFunction<Tuple2<Integer,Integer>> {
 
     private Connection connection = null;
     private PreparedStatement ps = null;
@@ -39,7 +40,15 @@ public class JSC_ZCAllNum extends RichSourceFunction<Tuple2<Integer,Integer>> {
         if (connection != null) {
 //            String sql = "select count(*) as AllNum from asset a where a.room is not null and a.partitions is not null and a.box is not null";
 //            String sql = "select count(*) as AllNum from asset a where a.id not in (select distinct asset_id from alarm WHERE TO_DAYS(time_occur) = TO_DAYS(NOW())) and a.room is not null";
-            String sql = "select count(*) as AllNum from asset a where a.id not in (select distinct asset_id from alarm)";
+ //           String sql = "select count(*) as AllNum from asset a where a.id not in (select distinct asset_id from alarm)";
+
+           String sql = "select\n" +
+                   "sum(case when b.asset_id is null then 1 else 0 end) as Allnum\n" +
+                   "from \n" +
+                   "(select asset_id from t_assalarm_asset where removed = 0 group by asset_id) a\n" +
+                   "left join\n" +
+                   "(select asset_id from alarm group by asset_id) b\n" +
+                   "on a.asset_id = b.asset_id\n";
             ps = connection.prepareStatement(sql);
         }
     }

@@ -38,7 +38,24 @@ public class RDWGGJ extends RichSourceFunction<Map<Integer, String>> {
         connection = MySQLUtil.getConnection(parameterTool);
 
         if (connection != null) {
-           String sql =  "select a.room,count(*) as num from asset a where a.id not in (select asset_id from alarm b where b.`status`=2 ) group by a.room having a.room is not null";
+//           String sql =  "select a.room,count(*) as num from asset a where a.id not in (select asset_id from alarm b where b.`status`=2 ) group by a.room having a.room is not null";
+            String sql = "select \n" +
+                    "item_value as room,\n" +
+                    "count(1) as num\n" +
+                    "from\n" +
+                    "(\n" +
+                    "select\n" +
+                    "*\n" +
+                    "from alarm \n" +
+                    "where status != 2\n" +
+                    ")a\n" +
+                    "left join\n" +
+                    "(\n" +
+                    "select asset_id,item_value from t_assalarm_asset where removed = 0 and item_code = 'computer_room_name'\n" +
+                    ")b\n" +
+                    "on a.asset_id = b.asset_id\n" +
+                    "where item_value is not null\n" +
+                    "group by item_value";
             ps = connection.prepareStatement(sql);
         }
     }

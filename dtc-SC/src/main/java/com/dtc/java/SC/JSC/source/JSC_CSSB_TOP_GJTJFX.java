@@ -36,9 +36,27 @@ public class JSC_CSSB_TOP_GJTJFX extends RichSourceFunction<Tuple5<String,String
         connection = MySQLUtil.getConnection(parameterTool);
 
         if (connection != null) {
-//            String sql = "select count(*) as AllNum from asset a where a.room is not null and a.partitions is not null and a.box is not null";
-            String sql = "select manufacturer_id,`name`,one_num,num from (select c.manufacturer_id,c.num,b.`name` from (select a.manufacturer_id,count(*) as num from asset a GROUP BY a.manufacturer_id having a.manufacturer_id is not null) c left join manufacturer b on  c.manufacturer_id = b.id) x \n" +
-                    "right join (select c.manufacturer_id as one_id,c.num as one_num ,b.`name` as one_name from (select a.manufacturer_id,count(*) as num from asset a where a.id in(select distinct asset_id from alarm) GROUP BY a.manufacturer_id having a.manufacturer_id!=\"\") c left join manufacturer b on  c.manufacturer_id = b.id) y on x.manufacturer_id = y.one_id";
+
+//            String sql = "select manufacturer_id,`name`,one_num,num from (select c.manufacturer_id,c.num,b.`name` from (select a.manufacturer_id,count(*) as num from asset a GROUP BY a.manufacturer_id having a.manufacturer_id is not null) c left join manufacturer b on  c.manufacturer_id = b.id) x \n" +
+//                    "right join (select c.manufacturer_id as one_id,c.num as one_num ,b.`name` as one_name from (select a.manufacturer_id,count(*) as num from asset a where a.id in(select distinct asset_id from alarm) GROUP BY a.manufacturer_id having a.manufacturer_id!=\"\") c left join manufacturer b on  c.manufacturer_id = b.id) y on x.manufacturer_id = y.one_id";
+
+            String sql = "select\n" +
+                    "a.manufacturer_id,\n" +
+                    "b.name,\n" +
+                    "count(c.asset_id) as one_num,\n" +
+                    "count(a.asset_id) as num\n" +
+                    "from\n" +
+                    "(\n" +
+                    "select asset_id,item_value as manufacturer_id from t_assalarm_asset where item_code='manufacturer' and item_value is not null and removed = 0\n" +
+                    ")a\n" +
+                    "left join\n" +
+                    "(select code,name from t_dic_item where type_code = 'manufacturer')b\n" +
+                    "on a.manufacturer_id = b.code\n" +
+                    "\n" +
+                    "left join \n" +
+                    "(select asset_id from alarm GROUP BY asset_id)c\n" +
+                    "on a.asset_id = c.asset_id\n" +
+                    "group by a.manufacturer_id,b.name\n";
             ps = connection.prepareStatement(sql);
         }
     }

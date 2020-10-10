@@ -38,8 +38,11 @@ public class DaPingAllNum extends RichSourceFunction<Tuple2<Integer,Integer>> {
 
         if (connection != null) {
 //            String sql = "select count(*) as AllNum from asset a where a.room is not null and a.partitions is not null and a.box is not null";
-            String sql = "select count(*) as AllNum from asset";
 //            String sql = "select count(*) as AllNum from asset a where a.room is not null";
+
+//            String sql = "select count(*) as AllNum from asset";
+            String sql = "select count(distinct asset_id) as AllNum from t_assalarm_asset where removed = 0";
+
             ps = connection.prepareStatement(sql);
         }
     }

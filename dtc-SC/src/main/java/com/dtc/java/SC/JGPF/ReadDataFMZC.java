@@ -36,8 +36,29 @@ public class ReadDataFMZC extends RichSourceFunction<Order> {
         connection = MySQLUtil.getConnection(parameterTool);
 
         if (connection != null) {
-           String sql =  "select a.room,count(*) as num from asset a where a.id not in (select asset_id from alarm) group by a.room having a.room is not null";
-//            String sql = "select room,count(*) as num from " + alarm_rule_table+" group by room";
+ //          String sql =  "select a.room,count(*) as num from asset a where a.id not in (select asset_id from alarm) group by a.room having a.room is not null";
+
+            String sql  = "select \n" +
+                    "computer_room_name as room,\n" +
+                    "count(a.asset_id) num\n" +
+                    "from\n" +
+                    "(\n" +
+                    "select\n" +
+                    "asset_id,\n" +
+                    "max(case when item_code = 'computer_room_name' then item_value end) as 'computer_room_name'\n" +
+                    "from t_assalarm_asset\n" +
+                    "where item_code = 'computer_room_name' and removed = 0\n" +
+                    "group by asset_id\n" +
+                    ")a\n" +
+                    "left join\n" +
+                    "(\n" +
+                    "select asset_id from alarm where asset_id is not null group by asset_id\n" +
+                    ")b\n" +
+                    "on a.asset_id = b.asset_id\n" +
+                    "where b.asset_id is null\n" +
+                    "group by computer_room_name";
+
+
             ps = connection.prepareStatement(sql);
         }
     }
