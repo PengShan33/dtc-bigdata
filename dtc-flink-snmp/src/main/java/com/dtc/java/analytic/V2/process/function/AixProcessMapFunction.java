@@ -2,6 +2,7 @@ package com.dtc.java.analytic.V2.process.function;
 
 import com.dtc.java.analytic.V2.common.model.DataStruct;
 import com.dtc.java.analytic.V2.enums.CodeTypeEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
@@ -14,6 +15,7 @@ import java.util.Map;
 /**
  * @author pengshan
  */
+@Slf4j
 public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, DataStruct, Tuple, TimeWindow> {
     /**
      * 内存总大小
@@ -87,168 +89,146 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
     public void process(Tuple tuple, Context context, Iterable<DataStruct> elements, Collector<DataStruct> out) throws Exception {
 
         for (DataStruct element : elements) {
-            /**
-             * 系统启动时间,暂时不做处理
-             */
-            if (CodeTypeEnum.AIX_SYSTEM_UP_TIME.getCode().equals(element.getZbFourName())) {
-                continue;
-            }
-
-            /**
-             * cpu使用率,直接使用
-             */
-            if (CodeTypeEnum.AIX_SECPU_UTILIZATION.getCode().equals(element.getZbFourName())) {
-                String cpuUsedRate;
-                String value = element.getValue();
-                if (StringUtils.isEmpty(value)) {
-                    cpuUsedRate = "0";
-                } else {
-                    cpuUsedRate = String.valueOf(Double.parseDouble(value) * 100);
+            //判断数据类型是否是数值型
+            boolean result = element.getValue().matches("(^-?[0-9][0-9]*(.[0-9]+)?)$");
+            if (!result) {
+                log.info("value is not number of string!" + element.getValue());
+            } else {
+                //主机系统参数：系统启动时间，后端判断在离线
+                if (CodeTypeEnum.AIX_SYSTEM_UP_TIME.getCode().equals(element.getZbFourName())) {
+                    out.collect(new DataStruct(element.getSystem_name(), element.getHost(), element.getZbFourName(), element.getZbLastCode(), element.getNameCN(), element.getNameEN(), element.getTime(), element.getValue()));
+                    continue;
                 }
-                out.collect(new DataStruct(element.getSystem_name(), element.getHost(), element.getZbFourName(), element.getZbLastCode(), element.getNameCN(), element.getNameEN(), element.getTime(), cpuUsedRate));
-                continue;
-            }
 
-            /**
-             * 内存总大小,KB转换为GB
-             */
-            if (CodeTypeEnum.AIX_MEMORY_SIZE.getCode().equals(element.getZbFourName())) {
-                memTotalSize = Double.parseDouble(element.getValue()) / kb2GbUnit;
-                String value = Double.parseDouble(element.getValue()) / kb2GbUnit + "";
-                element.setValue(value);
-                out.collect(element);
-                continue;
-            }
+                // cpu使用率,直接使用
+                if (CodeTypeEnum.AIX_SECPU_UTILIZATION.getCode().equals(element.getZbFourName())) {
+                    String cpuUsedRate;
+                    String value = element.getValue();
+                    if (StringUtils.isEmpty(value)) {
+                        cpuUsedRate = "0";
+                    } else {
+                        cpuUsedRate = String.valueOf(Double.parseDouble(value) * 100);
+                    }
+                    out.collect(new DataStruct(element.getSystem_name(), element.getHost(), element.getZbFourName(), element.getZbLastCode(), element.getNameCN(), element.getNameEN(), element.getTime(), cpuUsedRate));
+                    continue;
+                }
 
-            /**
-             * 每个分区簇的大小,单位Bytes
-             */
-            if (CodeTypeEnum.AIX_STORAGE_ALLOCATION_UNITS.getCode().equals(element.getZbFourName())) {
-                String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
-                String value = element.getValue();
-                cuSize.put(key, value);
-                continue;
-            }
+                //内存总大小,KB转换为GB
+                if (CodeTypeEnum.AIX_MEMORY_SIZE.getCode().equals(element.getZbFourName())) {
+                    memTotalSize = Double.parseDouble(element.getValue()) / kb2GbUnit;
+                    String value = Double.parseDouble(element.getValue()) / kb2GbUnit + "";
+                    element.setValue(value);
+                    out.collect(element);
+                    continue;
+                }
 
-            /**
-             * 每个分区簇的数目
-             */
-            if (CodeTypeEnum.AIX_STORAGE_SIZE.getCode().equals(element.getZbFourName())) {
-                String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
-                String value = element.getValue();
-                cuNum.put(key, value);
-                continue;
-            }
+                //每个分区簇的大小,单位Bytes
+                if (CodeTypeEnum.AIX_STORAGE_ALLOCATION_UNITS.getCode().equals(element.getZbFourName())) {
+                    String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
+                    String value = element.getValue();
+                    cuSize.put(key, value);
+                    continue;
+                }
 
-            /**
-             * 每个分区已使用的簇的数目
-             */
+               //每个分区簇的数目
+                if (CodeTypeEnum.AIX_STORAGE_SIZE.getCode().equals(element.getZbFourName())) {
+                    String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
+                    String value = element.getValue();
+                    cuNum.put(key, value);
+                    continue;
+                }
 
-            if (CodeTypeEnum.AIX_STORAGE_USED.getCode().equals(element.getZbFourName())) {
-                String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
-                String value = element.getValue();
-                cuUsedNum.put(key, value);
-                continue;
-            }
-            /**
-             * 每个分区磁盘大小
-             */
-            if (CodeTypeEnum.AIX_FS_SIZE.getCode().equals(element.getZbFourName())) {
-                String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
-                String value = element.getValue();
-                diskBlockSize.put(key, value);
-                continue;
-            }
+                //每个分区已使用的簇的数目
+                if (CodeTypeEnum.AIX_STORAGE_USED.getCode().equals(element.getZbFourName())) {
+                    String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
+                    String value = element.getValue();
+                    cuUsedNum.put(key, value);
+                    continue;
+                }
 
-            /**
-             * 每个分区磁盘剩余大小
-             */
-            if (CodeTypeEnum.AIX_FS_FREE.getCode().equals(element.getZbFourName())) {
-                String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
-                String value = element.getValue();
-                diskFreeBlockSize.put(key, value);
-                continue;
-            }
-            /**
-             * 接收错误报文数
-             */
-            if (CodeTypeEnum.AIX_IN_ERRORS.getCode().equals(element.getZbFourName())) {
-                String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
-                String value = element.getValue();
-                inErrorsMap.put(key, value);
-                continue;
-            }
+                //每个分区磁盘大小
+                if (CodeTypeEnum.AIX_FS_SIZE.getCode().equals(element.getZbFourName())) {
+                    String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
+                    String value = element.getValue();
+                    diskBlockSize.put(key, value);
+                    continue;
+                }
 
-            /**
-             * 发送错误报文数
-             */
-            if (CodeTypeEnum.AIX_OUT_ERRORS.getCode().equals(element.getZbFourName())) {
-                String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
-                String value = element.getValue();
-                outErrorsMap.put(key, value);
-                continue;
-            }
+                //每个分区磁盘剩余大小
+                if (CodeTypeEnum.AIX_FS_FREE.getCode().equals(element.getZbFourName())) {
+                    String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
+                    String value = element.getValue();
+                    diskFreeBlockSize.put(key, value);
+                    continue;
+                }
 
-            /**
-             *接收到的单播报文数
-             */
-            if (CodeTypeEnum.AIX_IN_UCAST_PKTS.getCode().equals(element.getZbFourName())) {
-                String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
-                String value = element.getValue();
-                inUcastPktsMap.put(key, value);
-                continue;
-            }
+                //接收错误报文数
+                if (CodeTypeEnum.AIX_IN_ERRORS.getCode().equals(element.getZbFourName())) {
+                    String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
+                    String value = element.getValue();
+                    inErrorsMap.put(key, value);
+                    continue;
+                }
 
-            /**
-             * 接收到的非单播报文数
-             */
-            if (CodeTypeEnum.AIX_IN_NUCAST_PKTS.getCode().equals(element.getZbFourName())) {
-                String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
-                String value = element.getValue();
-                inNUcastPktsMap.put(key, value);
-                continue;
-            }
+                //发送错误报文数
+                if (CodeTypeEnum.AIX_OUT_ERRORS.getCode().equals(element.getZbFourName())) {
+                    String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
+                    String value = element.getValue();
+                    outErrorsMap.put(key, value);
+                    continue;
+                }
 
-            /**
-             * 发送的单播报文数
-             */
-            if (CodeTypeEnum.AIX_OUT_UCAST_PKTS.getCode().equals(element.getZbFourName())) {
-                String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
-                String value = element.getValue();
-                outUcastPktsMap.put(key, value);
-                continue;
-            }
+                //接收到的单播报文数
+                if (CodeTypeEnum.AIX_IN_UCAST_PKTS.getCode().equals(element.getZbFourName())) {
+                    String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
+                    String value = element.getValue();
+                    inUcastPktsMap.put(key, value);
+                    continue;
+                }
 
-            /**
-             * 发送的非单播报文数
-             */
-            if (CodeTypeEnum.AIX_OUT_NUCAST_PKTS.getCode().equals(element.getZbFourName())) {
-                String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
-                String value = element.getValue();
-                outNUcastPktsMap.put(key, value);
-                continue;
-            }
+                //接收到的非单播报文数
+                if (CodeTypeEnum.AIX_IN_NUCAST_PKTS.getCode().equals(element.getZbFourName())) {
+                    String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
+                    String value = element.getValue();
+                    inNUcastPktsMap.put(key, value);
+                    continue;
+                }
 
-            /**
-             * 端口入流量
-             */
-            if (CodeTypeEnum.AIX_IN_OCTETS.getCode().equals(element.getZbFourName())) {
-                String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
-                String value = element.getValue();
-                inOctetsMap.put(key, value);
-                continue;
-            }
-            /**
-             * 端口出流量
-             */
-            if (CodeTypeEnum.AIX_OUT_OCTETS.getCode().equals(element.getZbFourName())) {
-                String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
-                String value = element.getValue();
-                outOctetsMap.put(key, value);
-                continue;
+                //发送的单播报文数
+                if (CodeTypeEnum.AIX_OUT_UCAST_PKTS.getCode().equals(element.getZbFourName())) {
+                    String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
+                    String value = element.getValue();
+                    outUcastPktsMap.put(key, value);
+                    continue;
+                }
+
+                //发送的非单播报文数
+                if (CodeTypeEnum.AIX_OUT_NUCAST_PKTS.getCode().equals(element.getZbFourName())) {
+                    String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
+                    String value = element.getValue();
+                    outNUcastPktsMap.put(key, value);
+                    continue;
+                }
+
+                //端口入流量
+                if (CodeTypeEnum.AIX_IN_OCTETS.getCode().equals(element.getZbFourName())) {
+                    String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
+                    String value = element.getValue();
+                    inOctetsMap.put(key, value);
+                    continue;
+                }
+
+                //端口出流量
+                if (CodeTypeEnum.AIX_OUT_OCTETS.getCode().equals(element.getZbFourName())) {
+                    String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
+                    String value = element.getValue();
+                    outOctetsMap.put(key, value);
+                    continue;
+                }
             }
 
         }
+
         // 已使用内存/内存使用率计算逻辑
         memoryUsageProcess(out);
         // 磁盘使用率计算逻辑
@@ -265,6 +245,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
         inOctetsProcess(out);
         //端口出流量
         outOctetsProcess(out);
+
     }
 
     /**
