@@ -251,18 +251,21 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
                     }
                 }
 
-                //主机内存:内存处理逻辑 包括内存总量/空闲内存/已用内存/内存使用率/内存空闲率
+                //主机内存:内存处理逻辑 包括内存总量/空闲内存/已用内存/共享内存/内存使用率/内存空闲率
                 if ("101_101_104_101_101".equals(in.getZbFourName())) {
-                    if (cpuMap.containsKey("101_101_104_105_105") && cpuMap.containsKey("101_101_104_103_103") && cpuMap.containsKey("101_101_104_104_104")) {
+                    if (cpuMap.containsKey("101_101_104_105_105") && cpuMap.containsKey("101_101_104_103_103")
+                            && cpuMap.containsKey("101_101_104_104_104") && cpuMap.containsKey("101_101_104_111_111")) {
                         //原始内存数据，单位为Kb
                         double mem_total = Double.parseDouble(in.getValue());
                         double mem_available = Double.parseDouble(cpuMap.get("101_101_104_105_105").toString());
                         double mem_buffered = Double.parseDouble(cpuMap.get("101_101_104_103_103").toString());
                         double mem_cached = Double.parseDouble(cpuMap.get("101_101_104_104_104").toString());
-                        getCpuInfo(collector, df, in, mem_total, mem_available, mem_buffered, mem_cached);
+                        double memShared = Double.parseDouble(cpuMap.get("101_101_104_111_111").toString());
+                        getCpuInfo(collector, df, in, mem_total, mem_available, mem_buffered, mem_cached, memShared);
                         cpuMap.remove("101_101_104_105_105");
                         cpuMap.remove("101_101_104_103_103");
                         cpuMap.remove("101_101_104_104_104");
+                        cpuMap.remove("101_101_104_111_111");
                         continue;
                     } else {
                         cpuMap.put("101_101_104_101_101", in.getValue());
@@ -270,15 +273,18 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
                     }
                 }
                 if ("101_101_104_105_105".equals(in.getZbFourName())) {
-                    if (cpuMap.containsKey("101_101_104_101_101") && cpuMap.containsKey("101_101_104_103_103") && cpuMap.containsKey("101_101_104_104_104")) {
+                    if (cpuMap.containsKey("101_101_104_101_101") && cpuMap.containsKey("101_101_104_103_103")
+                            && cpuMap.containsKey("101_101_104_104_104") && cpuMap.containsKey("101_101_104_111_111")) {
                         double mem_total = Double.parseDouble(cpuMap.get("101_101_104_101_101").toString());
                         double mem_available = Double.parseDouble(in.getValue());
                         double mem_buffered = Double.parseDouble(cpuMap.get("101_101_104_103_103").toString());
                         double mem_cached = Double.parseDouble(cpuMap.get("101_101_104_104_104").toString());
-                        getCpuInfo(collector, df, in, mem_total, mem_available, mem_buffered, mem_cached);
+                        double memShared = Double.parseDouble(cpuMap.get("101_101_104_111_111").toString());
+                        getCpuInfo(collector, df, in, mem_total, mem_available, mem_buffered, mem_cached, memShared);
                         cpuMap.remove("101_101_104_101_101");
                         cpuMap.remove("101_101_104_103_103");
                         cpuMap.remove("101_101_104_104_104");
+                        cpuMap.remove("101_101_104_111_111");
                         continue;
                     } else {
                         cpuMap.put("101_101_104_105_105", in.getValue());
@@ -286,15 +292,18 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
                     }
                 }
                 if ("101_101_104_103_103".equals(in.getZbFourName())) {
-                    if (cpuMap.containsKey("101_101_104_101_101") && cpuMap.containsKey("101_101_104_105_105") && cpuMap.containsKey("101_101_104_104_104")) {
+                    if (cpuMap.containsKey("101_101_104_101_101") && cpuMap.containsKey("101_101_104_105_105")
+                            && cpuMap.containsKey("101_101_104_104_104") && cpuMap.containsKey("101_101_104_111_111")) {
                         double mem_total = Double.parseDouble(cpuMap.get("101_101_104_101_101").toString());
                         double mem_available = Double.parseDouble(cpuMap.get("101_101_104_105_105").toString());
                         double mem_buffered = Double.parseDouble(in.getValue());
                         double mem_cached = Double.parseDouble(cpuMap.get("101_101_104_104_104").toString());
-                        getCpuInfo(collector, df, in, mem_total, mem_available, mem_buffered, mem_cached);
+                        double memShared = Double.parseDouble(cpuMap.get("101_101_104_111_111").toString());
+                        getCpuInfo(collector, df, in, mem_total, mem_available, mem_buffered, mem_cached, memShared);
                         cpuMap.remove("101_101_104_101_101");
                         cpuMap.remove("101_101_104_105_105");
                         cpuMap.remove("101_101_104_104_104");
+                        cpuMap.remove("101_101_104_111_111");
                         continue;
                     } else {
                         cpuMap.put("101_101_104_103_103", in.getValue());
@@ -302,18 +311,41 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
                     }
                 }
                 if ("101_101_104_104_104".equals(in.getZbFourName())) {
-                    if (cpuMap.containsKey("101_101_104_101_101") && cpuMap.containsKey("101_101_104_105_105") && cpuMap.containsKey("101_101_104_103_103")) {
+                    if (cpuMap.containsKey("101_101_104_101_101") && cpuMap.containsKey("101_101_104_105_105")
+                            && cpuMap.containsKey("101_101_104_103_103") && cpuMap.containsKey("101_101_104_111_111")) {
                         double mem_total = Double.parseDouble(cpuMap.get("101_101_104_101_101").toString());
                         double mem_available = Double.parseDouble(cpuMap.get("101_101_104_105_105").toString());
                         double mem_buffered = Double.parseDouble(cpuMap.get("101_101_104_103_103").toString());
                         double mem_cached = Double.parseDouble(in.getValue());
-                        getCpuInfo(collector, df, in, mem_total, mem_available, mem_buffered, mem_cached);
+                        double memShared = Double.parseDouble(cpuMap.get("101_101_104_111_111").toString());
+                        getCpuInfo(collector, df, in, mem_total, mem_available, mem_buffered, mem_cached, memShared);
                         cpuMap.remove("101_101_104_101_101");
                         cpuMap.remove("101_101_104_105_105");
-                        cpuMap.remove("101_101_104_104_104");
+                        cpuMap.remove("101_101_104_103_103");
+                        cpuMap.remove("101_101_104_111_111");
                         continue;
                     } else {
                         cpuMap.put("101_101_104_104_104", in.getValue());
+                        continue;
+                    }
+                }
+
+                if ("101_101_104_111_111".equals(in.getZbFourName())) {
+                    if (cpuMap.containsKey("101_101_104_101_101") && cpuMap.containsKey("101_101_104_105_105")
+                            && cpuMap.containsKey("101_101_104_103_103") && cpuMap.containsKey("101_101_104_104_104")) {
+                        double mem_total = Double.parseDouble(cpuMap.get("101_101_104_101_101").toString());
+                        double mem_available = Double.parseDouble(cpuMap.get("101_101_104_105_105").toString());
+                        double mem_buffered = Double.parseDouble(cpuMap.get("101_101_104_103_103").toString());
+                        double mem_cached = Double.parseDouble(cpuMap.get("101_101_104_104_104").toString());
+                        double memShared = Double.parseDouble(in.getValue());
+                        getCpuInfo(collector, df, in, mem_total, mem_available, mem_buffered, mem_cached, memShared);
+                        cpuMap.remove("101_101_104_101_101");
+                        cpuMap.remove("101_101_104_105_105");
+                        cpuMap.remove("101_101_104_104_104");
+                        cpuMap.remove("101_101_104_103_103");
+                        continue;
+                    } else {
+                        cpuMap.put("101_101_104_111_111", in.getValue());
                         continue;
                     }
                 }
@@ -415,11 +447,18 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
 
 
     /**
-     * 主机内存:内存处理逻辑 包括内存总量/空闲内存/已用内存/内存使用率/内存空闲率
+     * 主机内存:内存处理逻辑 包括内存总量/空闲内存/已用内存/共享内存/内存使用率/内存空闲率
      */
-    private void getCpuInfo(Collector<DataStruct> collector, DecimalFormat df, DataStruct in, double mem_total, double mem_available, double mem_buffered, double mem_cached) {
-//        double mem_used = mem_total - mem_available - mem_buffered - mem_cached;
-        double mem_used = mem_available;
+    private void getCpuInfo(Collector<DataStruct> collector, DecimalFormat df, DataStruct in, double mem_total, double mem_available, double mem_buffered, double mem_cached, double memShared) {
+
+        double result = memShared + mem_cached + mem_buffered;
+        double mem_used;
+        if (result > mem_total) {
+            mem_used = mem_total - mem_available - mem_buffered - mem_cached + memShared;
+        } else {
+            mem_used = mem_total - mem_available - mem_buffered - mem_cached;
+        }
+
         //总内存--单位MB
         String memoryTotal_M = df.format(mem_total / 1024d);
         collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), "101_101_104_101_101", "000", in.getNameCN(), in.getNameEN(), in.getTime(), memoryTotal_M));
@@ -437,11 +476,13 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
         String memoryCached = df.format(mem_cached / 1024d);
         collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), "101_101_104_104_104", "000", in.getNameCN(), in.getNameEN(), in.getTime(), memoryCached));
 
-
         //已用内存--单位MB
         String memoryUsed_M = df.format(mem_used / 1024d);
         collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), "101_101_104_102_102", "000", in.getNameCN(), in.getNameEN(), in.getTime(), memoryUsed_M));
 
+        //共享内存
+        String memoryShared = df.format(memShared / 1024d);
+        collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), "101_101_104_111_111", "000", in.getNameCN(), in.getNameEN(), in.getTime(), memoryCached));
 
         //内存使用率
         String memoryUsedRate;
