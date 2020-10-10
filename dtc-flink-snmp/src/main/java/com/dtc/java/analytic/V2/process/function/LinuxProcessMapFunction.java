@@ -55,32 +55,24 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
                 log.info("value is not number of string!" + in.getValue());
                 //TODO 若数据不是数值型，可以将数据存到hbse中，例如时间
             } else {
-                /**
-                 *  主机系统参数：系统启动时间，这一块不会执行。等待处理
-                 */
+                //主机系统参数：系统启动时间，后端判断在离线
                 if ("101_101_101_106_106".equals(in.getZbFourName())) {
-                    //todo
-//                    collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), in.getValue()));
+                    collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), in.getValue()));
                     continue;
                 }
 
-                /**
-                 *   主机网络接口状态：获取网络接口数量
-                 */
+                //主机网络接口状态：获取网络接口数量
                 if ("101_101_101_109_109".equals(in.getZbFourName())) {
                     netCardNumber = Integer.parseInt(in.getValue());
                     netCarNum.put(in.getHost(), netCardNumber);
                     collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), in.getValue()));
                     continue;
                 }
-                /**
-                 * cpu的平均load值:1min/5min/15min
-                 * */
+                //cpu的平均load值:1min/5min/15min
                 if ("101_101_101_101_101".equals(in.getZbFourName()) || "101_101_101_102_102".equals(in.getZbFourName()) || "101_101_101_103_103".equals(in.getZbFourName())) {
                     collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), in.getValue()));
                     continue;
                 }
-
 
                 //网卡发送字节数(M)
                 if ("101_101_103_101_101".equals(in.getZbFourName())) {
@@ -259,10 +251,7 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
                     }
                 }
 
-                /**
-                 *  主机内存:内存处理逻辑 包括内存总量/空闲内存/已用内存/内存使用率/内存空闲率
-                 */
-
+                //主机内存:内存处理逻辑 包括内存总量/空闲内存/已用内存/内存使用率/内存空闲率
                 if ("101_101_104_101_101".equals(in.getZbFourName())) {
                     if (cpuMap.containsKey("101_101_104_105_105") && cpuMap.containsKey("101_101_104_103_103") && cpuMap.containsKey("101_101_104_104_104")) {
                         //原始内存数据，单位为Kb
@@ -336,10 +325,10 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
                     continue;
                 }
 
-        /*
-        主机swap空间
-         */
-                //Linux的Swap使用空间占比
+                /**
+                 * 主机swap空间
+                 * Linux的Swap使用空间占比
+                 */
                 if ("101_101_105_101_101".equals(in.getZbFourName())) {
                     if (swapMap.containsKey("101_101_105_102_102")) {
                         double swap_total = Double.parseDouble(in.getValue());
@@ -395,10 +384,7 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
                         continue;
                     }
                 }
-                /**
-                 * cpu系统使用率/用户使用率
-                 *
-                 * */
+                //cpu系统使用率/用户使用率
                 if ("101_101_106_101_101".equals(in.getZbFourName()) || "101_101_106_102_102".equals(in.getZbFourName())) {
                     collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), in.getValue()));
                     continue;
@@ -410,17 +396,13 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
                     continue;
                 }
 
-                /**
-                 * 主机磁盘
-                 */
+                //主机磁盘
                 if ("101_101_107_104_104".equals(in.getZbFourName()) || "101_101_107_105_105".equals(in.getZbFourName()) || "101_101_107_106_106".equals(in.getZbFourName())) {
                     String result = Double.parseDouble(in.getValue()) / 1048576 + "";
                     collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), result));
                     continue;
                 }
-                /**
-                 * 磁盘使用率
-                 * */
+                //磁盘使用率
                 if ("101_101_107_107_107".equals(in.getZbFourName())) {
                     collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), in.getValue()));
                     continue;
@@ -437,13 +419,13 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
      */
     private void getCpuInfo(Collector<DataStruct> collector, DecimalFormat df, DataStruct in, double mem_total, double mem_available, double mem_buffered, double mem_cached) {
 //        double mem_used = mem_total - mem_available - mem_buffered - mem_cached;
-        double mem_used= mem_available;
+        double mem_used = mem_available;
         //总内存--单位MB
         String memoryTotal_M = df.format(mem_total / 1024d);
         collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), "101_101_104_101_101", "000", in.getNameCN(), in.getNameEN(), in.getTime(), memoryTotal_M));
 
         //可获取内存--单位MB
-        double mem_free=mem_total-mem_used;
+        double mem_free = mem_total - mem_used;
         String memoryAvailable = df.format(mem_free / 1024d);
         collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), "101_101_104_105_105", "000", in.getNameCN(), in.getNameEN(), in.getTime(), memoryAvailable));
 
@@ -462,11 +444,11 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
 
 
         //内存使用率
-        String memoryUsedRate=null;
+        String memoryUsedRate;
         double v = mem_used / mem_total * 100;
-        if(v<0.0){
-            memoryUsedRate ="0";
-        }else {
+        if (v < 0.0) {
+            memoryUsedRate = "0";
+        } else {
             memoryUsedRate = String.valueOf(mem_used / mem_total * 100);
         }
         collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), "101_101_104_109_109", "000", in.getNameCN(), in.getNameEN(), in.getTime(), memoryUsedRate));

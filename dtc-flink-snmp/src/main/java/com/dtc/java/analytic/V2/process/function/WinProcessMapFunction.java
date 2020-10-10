@@ -72,20 +72,13 @@ public class WinProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
         for (DataStruct wc : iterable) {
             String keyValue = wc.getHost() + "_" + wc.getZbLastCode();
 
-            /**
-             *
-             * 系统启动时间
-             *
-             * */
+            //主机系统参数：系统启动时间，后端判断在离线
             if ("101_100_105_102_102".equals(wc.getZbFourName())) {
-                //TODO:写hbase
                 collector.collect(new DataStruct(wc.getSystem_name(), wc.getHost(), wc.getZbFourName(), wc.getZbLastCode(), wc.getNameCN(), wc.getNameEN(), wc.getTime(), wc.getValue()));
                 continue;
             }
 
-            /**
-             * cpu使用率
-             * */
+            //cpu使用率
             if ("101_100_101_101_101".equals(wc.getZbFourName())) {
                 if (!cpuNum.containsKey(keyValue)) {
                     cpuNum.put(keyValue, "1");
@@ -112,7 +105,7 @@ public class WinProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                         continue;
                     } else {
                         if (count < 1) {
-                            double result = (cpu_sum / list.size())*100;
+                            double result = (cpu_sum / list.size()) * 100;
                             collector.collect(new DataStruct(wc.getSystem_name(), wc.getHost(), wc.getZbFourName(), "", wc.getNameCN(), wc.getNameEN(), wc.getTime(), String.valueOf(result)));
                             count += 1;
                             cpuNum.clear();
@@ -122,9 +115,7 @@ public class WinProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 }
 
             }
-            /**
-             * 磁盘描述：存储的目的是为了保存指标与磁盘的对应关系
-             * */
+            //磁盘描述：存储的目的是为了保存指标与磁盘的对应关系
             if ("101_100_103_103_103".equals(wc.getZbFourName())) {
                 if ((!diskDescribe.containsKey(keyValue)) || (diskDescribe.containsKey(keyValue) && (!diskDescribe.get(keyValue).equals(wc.getValue())))) {
                     diskDescribe.put(keyValue, wc.getValue());
@@ -150,25 +141,19 @@ public class WinProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                     }
                 }
             }
-            /**
-             * 每个块的大小
-             * */
+            //每个块的大小
             if ("101_100_103_104_104".equals(wc.getZbFourName())) {
                 if ((!diskBlockSize.containsKey(keyValue)) || (diskBlockSize.containsKey(keyValue) && (!diskBlockSize.get(keyValue).equals(wc.getValue())))) {
                     diskBlockSize.put(keyValue, wc.getValue());
                 }
             }
-            /**
-             * 磁盘块的个数
-             * */
+            //磁盘块的个数
             if ("101_100_103_105_105".equals(wc.getZbFourName())) {
                 if ((!diskBlockNum.containsKey(keyValue)) || (diskBlockNum.containsKey(keyValue) && (!diskBlockNum.get(keyValue).equals(wc.getValue())))) {
                     diskBlockNum.put(keyValue, wc.getValue());
                 }
             }
-            /**
-             * 每个盘的总容量
-             * */
+            //每个盘的总容量
             if (getLikeByMap(diskBlockNum, wc.getHost()) == getLikeByMap(diskBlockSize, wc.getHost())) {
                 for (String keyA : diskBlockSize.keySet()) {
                     for (String keyB : diskBlockNum.keySet()) {
@@ -185,10 +170,11 @@ public class WinProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                     }
                 }
             }
+
             /**
              * 每个磁盘使用率
              * 虚拟/物理内存使用率
-             * */
+             */
             List<String> list1 = new ArrayList<>();
             for (Map.Entry<String, String> entity : diskBlockSize.entrySet()) {
                 if (entity.getKey().startsWith(wc.getHost())) {
@@ -201,8 +187,8 @@ public class WinProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 //磁盘使用率
                 if (diskUsedCapacity == 0) {
                     collector.collect(new DataStruct(wc.getSystem_name(), wc.getHost(), "101_100_103_107_107", wc.getZbLastCode(), wc.getNameCN(), wc.getNameEN(), wc.getTime(), String.valueOf(0)));
-                }else {
-                    double rato_used_disk = (used_disk / diskUsedCapacity)*100;
+                } else {
+                    double rato_used_disk = (used_disk / diskUsedCapacity) * 100;
                     collector.collect(new DataStruct(wc.getSystem_name(), wc.getHost(), "101_100_103_107_107", wc.getZbLastCode(), wc.getNameCN(), wc.getNameEN(), wc.getTime(), String.valueOf(rato_used_disk)));
                 }
                 usedDiskMap.put(keyValue, wc.getValue());
@@ -216,10 +202,10 @@ public class WinProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                     for (String s1 : diskCaption.values()) {
                         res += Double.parseDouble(s1);
                     }
-                    if(res==0){
+                    if (res == 0) {
                         collector.collect(new DataStruct(wc.getSystem_name(), wc.getHost(), "101_100_103_108_108", "", wc.getNameCN(), wc.getNameEN(), wc.getTime(), String.valueOf(0)));
-                    }else {
-                        double zonghe_disk_rate = (re / res)*100;
+                    } else {
+                        double zonghe_disk_rate = (re / res) * 100;
                         BigDecimal db = new BigDecimal(zonghe_disk_rate);
                         String result = db.toPlainString();
                         collector.collect(new DataStruct(wc.getSystem_name(), wc.getHost(), "101_100_103_108_108", "", wc.getNameCN(), wc.getNameEN(), wc.getTime(), result));
@@ -228,10 +214,7 @@ public class WinProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 continue;
             }
 
-            /**
-             *
-             * 网络接口相关
-             * */
+            //网络接口相关
             if ("101_100_104_101_101".equals(wc.getZbFourName())) {
                 net_num = Double.valueOf(wc.getValue());
                 collector.collect(new DataStruct(wc.getSystem_name(), wc.getHost(), wc.getZbFourName(), "", wc.getNameCN(), wc.getNameEN(), wc.getTime(), wc.getValue()));
@@ -241,14 +224,14 @@ public class WinProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 rec_total += Double.valueOf(wc.getValue());
                 rec_total_count += 1;
                 if (rec_total_count == net_num) {
-                    double result = rec_total/(1024*1024);
+                    double result = rec_total / (1024 * 1024);
                     collector.collect(new DataStruct(wc.getSystem_name(), wc.getHost(), wc.getZbFourName(), "", wc.getNameCN(), wc.getNameEN(), wc.getTime(), String.valueOf(result)));
                 }
             } else if ("101_100_104_103_103".equals(wc.getZbFourName())) {
                 sent_total += Double.valueOf(wc.getValue());
                 sent_total_count += 1;
                 if (sent_total_count == net_num) {
-                    double result = sent_total/(1024*1024);
+                    double result = sent_total / (1024 * 1024);
                     collector.collect(new DataStruct(wc.getSystem_name(), wc.getHost(), wc.getZbFourName(), "", wc.getNameCN(), wc.getNameEN(), wc.getTime(), String.valueOf(result)));
                 }
             } else if ("101_100_104_104_104".equals(wc.getZbFourName())) {
@@ -275,7 +258,7 @@ public class WinProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 if (error_out_num == net_num) {
                     collector.collect(new DataStruct(wc.getSystem_name(), wc.getHost(), wc.getZbFourName(), "", wc.getNameCN(), wc.getNameEN(), wc.getTime(), String.valueOf(error_out_count)));
                 }
-            }else if("107_107_101_101_101".equals(wc.getZbFourName())){
+            } else if ("107_107_101_101_101".equals(wc.getZbFourName())) {
                 collector.collect(new DataStruct(wc.getSystem_name(), wc.getHost(), wc.getZbFourName(), wc.getZbLastCode(), wc.getNameCN(), wc.getNameEN(), wc.getTime(), wc.getValue()));
             }
         }
