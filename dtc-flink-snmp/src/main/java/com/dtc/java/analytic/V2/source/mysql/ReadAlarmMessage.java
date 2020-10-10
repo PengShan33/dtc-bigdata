@@ -41,10 +41,28 @@ public class ReadAlarmMessage extends RichSourceFunction<Tuple9<String, String, 
         connection = MySQLUtil.getConnection(driver, url, username, password);
 
         if (connection != null) {
-//            String sql = "select b.asset_id,e.ipv4,c.strategy_id,c.trigger_kind,c.trigger_name,c.number,c.unit,c.`code`,d.is_enable,d.alarm_level,d.up_time,e.`code` as asset_code,e.`name` from (select * from strategy_trigger a \n" +
-//                    "where a.code!=\"\" and a.comparator='>') c left join strategy_asset_mapping b on c.strategy_id = b. strategy_id left join alarm_strategy d on c.strategy_id = d.id left join asset e on e.id = b.asset_id";
-//            String sql = "select o.asset_id,o.ipv4,o.strategy_id,o.trigger_kind,o.trigger_name,o.number,o.unit,o.`code`,o.is_enable,o.alarm_level,o.up_time,o.asset_code,o.`name`,p.id from (select b.asset_id,e.ipv4,c.strategy_id,c.trigger_kind,c.trigger_name,c.number,c.unit,c.`code`,d.is_enable,d.alarm_level,d.up_time,e.`code` as asset_code,e.`name` from (select * from strategy_trigger a \n" +
-//                    "where a.code!=\"\" and a.comparator='>') c left join strategy_asset_mapping b on c.strategy_id = b. strategy_id left join alarm_strategy d on c.strategy_id = d.id left join asset e on e.id = b.asset_id) o left join asset_indice p on o.code = p.code";
+
+//            String sql = "select c.asset_id,d.ipv4,b.strategy_id,b.trigger_kind,b.trigger_name,b.number,b.unit,b.code,a.is_enable,a.alarm_level,a.up_time,d.code as asset_code,d.name,e.id\n" +
+//                    "from\n" +
+//                    "(\n" +
+//                    "select\n" +
+//                    "*\n" +
+//                    "from\n" +
+//                    "alarm_strategy\n" +
+//                    "where is_enable = 1\n" +
+//                    ") a\n" +
+//                    "left join\n" +
+//                    "(\n" +
+//                    "select * from strategy_trigger where code is not null and code != \"\" and (comparator = \">\" or comparator = \">=\")\n" +
+//                    ")b\n" +
+//                    "on a.id = b.strategy_id\n" +
+//                    "left join strategy_asset_mapping c\n" +
+//                    "on b.strategy_id = c.strategy_id\n" +
+//                    "left join asset d\n" +
+//                    "on c.asset_id = d.id\n" +
+//                    "left join asset_indice e\n" +
+//                    "on b.code = e.code";
+
             String sql = "select c.asset_id,d.ipv4,b.strategy_id,b.trigger_kind,b.trigger_name,b.number,b.unit,b.code,a.is_enable,a.alarm_level,a.up_time,d.code as asset_code,d.name,e.id\n" +
                     "from\n" +
                     "(\n" +
@@ -61,10 +79,25 @@ public class ReadAlarmMessage extends RichSourceFunction<Tuple9<String, String, 
                     "on a.id = b.strategy_id\n" +
                     "left join strategy_asset_mapping c\n" +
                     "on b.strategy_id = c.strategy_id\n" +
-                    "left join asset d\n" +
-                    "on c.asset_id = d.id\n" +
+                    "\n" +
+                    "left join \n" +
+                    "(\n" +
+                    "select\n" +
+                    "asset_id,\n" +
+                    "max(case when item_code = 'asset_name' then item_value end) as 'name',\n" +
+                    "max(case when item_code = 'asset_code' then item_value end) as 'code',\n" +
+                    "max(case when item_code = 'ip_address' then item_value end) as 'ipv4'\n" +
+                    "from t_assalarm_asset\n" +
+                    "where removed = 0 and (item_code = 'asset_name'  or item_code = 'asset_code'  or item_code = 'ip_address')\n" +
+                    "group by asset_id\n" +
+                    ")d\n" +
+                    "on c.asset_id = d.asset_id\n" +
+                    "\n" +
                     "left join asset_indice e\n" +
                     "on b.code = e.code";
+
+
+
             ps = connection.prepareStatement(sql);
         }
     }
