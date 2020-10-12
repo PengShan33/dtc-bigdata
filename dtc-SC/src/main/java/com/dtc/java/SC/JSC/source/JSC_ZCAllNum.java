@@ -45,10 +45,10 @@ JSC_ZCAllNum extends RichSourceFunction<Tuple2<Integer,Integer>> {
            String sql = "select\n" +
                    "sum(case when b.asset_id is null then 1 else 0 end) as Allnum\n" +
                    "from \n" +
-                   "(select asset_id from t_assalarm_asset where removed = 0 group by asset_id) a\n" +
+                   "(select asset_id from t_assalarm_asset where removed = 0 and type = 1 group by asset_id) a\n" +
                    "left join\n" +
                    "(select asset_id from alarm group by asset_id) b\n" +
-                   "on a.asset_id = b.asset_id\n";
+                   "on a.asset_id = b.asset_id";
             ps = connection.prepareStatement(sql);
         }
     }

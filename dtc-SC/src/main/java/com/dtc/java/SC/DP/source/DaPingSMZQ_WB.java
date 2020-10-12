@@ -50,7 +50,7 @@ public class DaPingSMZQ_WB extends RichSourceFunction<Tuple2<Integer,Integer>> {
                     "from t_assalarm_asset \n" +
                     "where removed = 0 and item_code = 'maintenance_expir_date'\n" +
                     ")a\n" +
-                    "where now()>=DATE_SUB(item_value,INTERVAL 6 MONTH) and now()<=item_value";
+                    "where now()>=DATE_SUB(item_value,INTERVAL 7 DAY) and now()<=item_value";
             ps = connection.prepareStatement(sql);
         }
     }

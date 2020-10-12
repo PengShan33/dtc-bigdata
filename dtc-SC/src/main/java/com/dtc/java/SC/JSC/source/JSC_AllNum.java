@@ -36,7 +36,7 @@ public class JSC_AllNum extends RichSourceFunction<Tuple2<Integer,Integer>> {
         connection = MySQLUtil.getConnection(parameterTool);
 
         if (connection != null) {
-            String sql = "select count(*) as AllNum from asset a";
+            String sql = "select count(distinct asset_id) from t_assalarm_asset where removed = 0 and type = 1";
             ps = connection.prepareStatement(sql);
         }
     }
