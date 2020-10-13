@@ -3,7 +3,6 @@ package com.dtc.java.analytic.V2.process.function;
 import com.dtc.java.analytic.V2.common.model.DataStruct;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.java.tuple.Tuple;
-import org.apache.flink.api.java.tuple.Tuple6;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
@@ -21,8 +20,9 @@ import java.util.Map;
 public class H3CSwitchProcessMapFunction extends ProcessWindowFunction<DataStruct, DataStruct, Tuple, TimeWindow> {
     /**
      * 此处的map<code(in.f2.in.f3),value_time>
-     * */
+     */
     Map<String, String> mapSwitch = new HashMap<>();
+
     @Override
     public void process(Tuple tuple, Context context, Iterable<DataStruct> iterable, Collector<DataStruct> collector) throws Exception {
         for (DataStruct in : iterable) {
@@ -42,7 +42,7 @@ public class H3CSwitchProcessMapFunction extends ProcessWindowFunction<DataStruc
                      * (102_101,ip,102_101_101_101_101,101.1.0,time,value)
                      *其中ZB_code为例：机器ip,1.0表示机框1，0板卡，表示机框1，板卡0的cpu使用率
                      */
-                    collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(),in.getNameCN(), in.getNameEN(), in.getTime(),in.getValue()));
+                    collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), in.getValue()));
                     continue;
                 }
                 if (code.equals("102_101_103_108_109")) {
@@ -55,12 +55,16 @@ public class H3CSwitchProcessMapFunction extends ProcessWindowFunction<DataStruc
                         long currentTime = Long.parseLong(in.getTime());
                         double result = 0;
                         try {
-                            result = 8 * Math.abs((lastValue - currentValue)) / ((currentTime-lastTime)/1000);
+                            /**
+                             * 交换机返回的为累加统计，所以需要中间等待后，再次获取，计算两次的差
+                             *  返回的值为byte，需要先乘8，计算为bit然后再除1024，计算进位量
+                             */
+                            result = 8 * Math.abs((lastValue - currentValue)) / 1024 / ((currentTime - lastTime) / 1000);
                         } catch (ArithmeticException exc) {
                             log.error("交换机端口出速率计算时，时间差为0.", exc);
                         }
-                        collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), "102_101_103_104_105", in.getZbLastCode(),in.getNameCN(), in.getNameEN(), in.getTime(),String.valueOf(result)));
-                        mapSwitch.put(in.getHost() + "." + in.getZbFourName(),new_value);
+                        collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), "102_101_103_104_105", in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), String.valueOf(result)));
+                        mapSwitch.put(in.getHost() + "." + in.getZbFourName(), new_value);
                         continue;
                     } else {
                         mapSwitch.put(in.getHost() + "." + in.getZbFourName(), new_value);
@@ -75,17 +79,21 @@ public class H3CSwitchProcessMapFunction extends ProcessWindowFunction<DataStruc
                         long lastTime = Long.parseLong(s[1]);
                         double currentValue = Double.parseDouble(in.getValue());
                         long currentTime = Long.parseLong(in.getTime());
-                        double result ;
+                        double result;
                         try {
-                            result = 8 * Math.abs((lastValue - currentValue)) / ((currentTime-lastTime)/1000);
+                            /**
+                             * 交换机返回的为累加统计，所以需要中间等待后，再次获取，计算两次的差
+                             *  返回的值为byte，需要先乘8，计算为bit然后再除1024，计算进位量
+                             */
+                            result = 8 * Math.abs((lastValue - currentValue)) / 1024 / ((currentTime - lastTime) / 1000);
                         } catch (ArithmeticException exc) {
                             log.error("交换机端口入速率计算时，时间差为0.", exc);
                             continue;
                         }
-                        collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), "102_101_103_105_106", in.getZbLastCode(),in.getNameCN(), in.getNameEN(), in.getTime(),String.valueOf(result)));
-                        mapSwitch.put(in.getHost() + "." + in.getZbFourName(),new_value);
+                        collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), "102_101_103_105_106", in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), String.valueOf(result)));
+                        mapSwitch.put(in.getHost() + "." + in.getZbFourName(), new_value);
                     } else {
-                        mapSwitch.put(in.getHost() + "." + in.getZbFourName(),new_value);
+                        mapSwitch.put(in.getHost() + "." + in.getZbFourName(), new_value);
                     }
                 }
             }
