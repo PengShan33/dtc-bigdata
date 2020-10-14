@@ -6,7 +6,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 /**
  * @author
  */
-public class RouterMapFunction implements MapFunction<DataStruct, DataStruct> {
+public class H3cRouterMapFunction implements MapFunction<DataStruct, DataStruct> {
 
     @Override
     public DataStruct map(DataStruct event) throws Exception {
@@ -15,11 +15,11 @@ public class RouterMapFunction implements MapFunction<DataStruct, DataStruct> {
             String lastCode = zbLastCode.split("\\.", 2)[0];
             String zbLastCodeResult = zbLastCode.split("\\.", 2)[1];
             String codeResult = event.getZbFourName() + "_" + lastCode;
-            return new DataStruct(event.getSystem_name() + "|router_0", event.getHost(), codeResult, zbLastCodeResult, event.getNameCN(), event.getNameEN(), event.getTime(), event.getValue());
+            return new DataStruct(event.getSystem_name() + "|h3c_router_0", event.getHost(), codeResult, zbLastCodeResult, event.getNameCN(), event.getNameEN(), event.getTime(), event.getValue());
         } else {
             String zbLastCodeResult = "";
             String codeResult = event.getZbFourName() + "_" + event.getZbLastCode();
-            return new DataStruct(event.getSystem_name() + "|router_1", event.getHost(), codeResult, zbLastCodeResult, event.getNameCN(), event.getNameEN(), event.getTime(), event.getValue());
+            return new DataStruct(event.getSystem_name() + "|h3c_router_1", event.getHost(), codeResult, zbLastCodeResult, event.getNameCN(), event.getNameEN(), event.getTime(), event.getValue());
         }
     }
 }

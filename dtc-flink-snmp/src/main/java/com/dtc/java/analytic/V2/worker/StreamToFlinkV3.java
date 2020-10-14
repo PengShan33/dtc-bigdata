@@ -97,11 +97,11 @@ public class StreamToFlinkV3 {
 
     private static void routerDataProcess(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, ParameterTool parameterTool, TimesConstats build) {
         SingleOutputStreamOperator<DataStruct> routerProcess = splitStream
-                .select("Router")
-                .map(new RouterMapFunction())
+                .select("H3c_Router")
+                .map(new H3cRouterMapFunction())
                 .keyBy("Host")
                 .timeWindow(Time.of(windowSizeMillis, TimeUnit.MILLISECONDS))
-                .process(new RouterProcessMapFunction());
+                .process(new H3cRouterProcessMapFunction());
 
 //        路由器数据全量写opentsdb
         routerProcess.addSink(new PSinkToOpentsdb(opentsdb_url));

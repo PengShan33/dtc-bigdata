@@ -17,7 +17,7 @@ import java.util.Map;
  * @author
  */
 @Slf4j
-public class RouterProcessMapFunction extends ProcessWindowFunction<DataStruct, DataStruct, Tuple, TimeWindow> {
+public class H3cRouterProcessMapFunction extends ProcessWindowFunction<DataStruct, DataStruct, Tuple, TimeWindow> {
 
     /**
      * byte转换为gb单位
@@ -125,7 +125,7 @@ public class RouterProcessMapFunction extends ProcessWindowFunction<DataStruct, 
             for (String key : inErrorsMap.keySet()) {
                 String[] split = key.split("-");
                 host = split[0];
-                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|router";
+                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|h3c_router";
                 inErrorsNum += Long.parseLong(inErrorsMap.get(key));
             }
             String value = String.valueOf(inErrorsNum);
@@ -152,7 +152,7 @@ public class RouterProcessMapFunction extends ProcessWindowFunction<DataStruct, 
             for (String key : outErrorsMap.keySet()) {
                 String[] split = key.split("-");
                 host = split[0];
-                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|router";
+                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|h3c_router";
                 outErrorsNum += Long.parseLong(outErrorsMap.get(key));
             }
             String value = String.valueOf(outErrorsNum);
@@ -179,7 +179,7 @@ public class RouterProcessMapFunction extends ProcessWindowFunction<DataStruct, 
             for (String key : inOctetsMap.keySet()) {
                 String[] split = key.split("-");
                 host = split[0];
-                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|router";
+                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|h3c_router";
 
                 inOctetsSize += Double.parseDouble(inOctetsMap.get(key));
             }
@@ -207,7 +207,7 @@ public class RouterProcessMapFunction extends ProcessWindowFunction<DataStruct, 
             for (String key : outOctetsMap.keySet()) {
                 String[] split = key.split("-");
                 host = split[0];
-                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|router";
+                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|h3c_router";
 
                 outOctetsSize += Double.parseDouble(outOctetsMap.get(key));
             }
