@@ -28,8 +28,6 @@ import org.apache.flink.streaming.api.datastream.*;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,8 +45,10 @@ import static com.dtc.java.analytic.V2.worker.untils.MainUntils.*;
  * @author :ren
  */
 public class StreamToFlinkV3 {
-    private static final Logger logger = LoggerFactory.getLogger(StreamToFlinkV3.class);
-    //布隆过滤器
+
+    /**
+     * 布隆过滤器
+     */
     static BloomFilter<String> bf = BloomFilter.create(Funnels.stringFunnel(Charsets.UTF_8), 1000000, 0.001);
     private static DataStream<Map<String, String>> alarmDataStream = null;
 
@@ -57,14 +57,15 @@ public class StreamToFlinkV3 {
                 "alarm_rules",
                 BasicTypeInfo.STRING_TYPE_INFO,
                 BasicTypeInfo.STRING_TYPE_INFO);
+
         ParameterTool parameterTool = ExecutionEnvUtil.createParameterTool(args);
-        String opentsdb_url = parameterTool.get(PropertiesConstants.OPENTSDB_URL, "http://10.10.76.58:4399").trim();
+        String opentsdb_url = parameterTool.get(PropertiesConstants.OPENTSDB_URL, "http://10.3.7.231:4399").trim();
         int windowSizeMillis = parameterTool.getInt(PropertiesConstants.WINDOWS_SIZE, 10 * 1000);
         TimesConstats build = getSize(parameterTool);
         StreamExecutionEnvironment env = ExecutionEnvUtil.prepare(parameterTool);
         env.getConfig().setGlobalJobParameters(parameterTool);
 //        env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-        //asset_id, ipv4, strategy_kind, triger_name, number, code, alarm_level, asset_code, name
+//        asset_id, ipv4, strategy_kind, triger_name, number, code, alarm_level, asset_code, name
         DataStreamSource<Tuple9<String, String, String, String, Double, String, String, String, String>> alarmMessageMysql = env.addSource(new ReadAlarmMessage()).setParallelism(1);
         DataStream<Map<String, Tuple9<String, String, String, Double, Double, Double, Double, String, String>>> process = alarmMessageMysql.keyBy(0, 5).timeWindow(Time.milliseconds(windowSizeMillis)).process(new MySqlProcessMapFunction());
         alarmDataStream = process.map(new MySQLFunction());
@@ -72,48 +73,59 @@ public class StreamToFlinkV3 {
 
         DataStreamSource<SourceEvent> streamSource = KafkaConfigUtil.buildSource(env);
 
-        /**
-         * {"time":"1581691002687","code":"101_101_107_105_105","host":"10.3.7.234","nameCN":"磁盘剩余大小","value":"217802544","nameEN":"disk_free"}
-         * */
+//        {"time":"1581691002687","code":"101_101_107_105_105","host":"10.3.7.234","nameCN":"磁盘剩余大小","value":"217802544","nameEN":"disk_free"}
         SingleOutputStreamOperator<DataStruct> mapStream = streamSource.map(new MyMapFunctionV3());
-//        SingleOutputStreamOperator<DataStruct> timeSingleOutputStream
-//                = mapStream.assignTimestampsAndWatermarks(new DtcPeriodicAssigner());
 
         SplitStream<DataStruct> splitStream
                 = getSplit(mapStream);
-        //windows指标数据处理
-        Win_Data_Process(opentsdb_url, windowSizeMillis, broadcast, splitStream, build);
-        //linux指标数据处理
-        Linux_Data_Process(opentsdb_url, windowSizeMillis, broadcast, splitStream, build);
-        //aix指标数据处理
-        Aix_Data_Process(opentsdb_url, windowSizeMillis, broadcast, splitStream, build);
-        //h3c交换机处理
-        H3c_Data_Process(opentsdb_url, windowSizeMillis, broadcast, splitStream, parameterTool, build);
-        ZX_Data_Process(opentsdb_url, windowSizeMillis, broadcast, splitStream, parameterTool, build);
-        DPI_Data_Process(opentsdb_url, windowSizeMillis, broadcast, splitStream, parameterTool, build);
+//        windows指标数据处理
+        winDataProcess(opentsdb_url, windowSizeMillis, broadcast, splitStream, build);
+//        linux指标数据处理
+        linuxDataProcess(opentsdb_url, windowSizeMillis, broadcast, splitStream, build);
+//        aix指标数据处理
+        aixDataProcess(opentsdb_url, windowSizeMillis, broadcast, splitStream, build);
+//        h3c交换机处理
+        h3cDataProcess(opentsdb_url, windowSizeMillis, broadcast, splitStream, parameterTool, build);
+//        中兴交换机
+        zxDataProcess(opentsdb_url, windowSizeMillis, broadcast, splitStream, parameterTool, build);
+//        dpi设备
+        dpiDataProcess(opentsdb_url, windowSizeMillis, broadcast, splitStream, parameterTool, build);
+//        路由器
+        routerDataProcess(opentsdb_url, windowSizeMillis, broadcast, splitStream, parameterTool, build);
         env.execute("Dtc-Alarm-Flink-Process");
     }
 
-    private static void Win_Data_Process(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, TimesConstats build) {
+    private static void routerDataProcess(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, ParameterTool parameterTool, TimesConstats build) {
+        SingleOutputStreamOperator<DataStruct> routerProcess = splitStream
+                .select("Router")
+                .map(new RouterMapFunction())
+                .keyBy("Host")
+                .timeWindow(Time.of(windowSizeMillis, TimeUnit.MILLISECONDS))
+                .process(new RouterProcessMapFunction());
+
+//        路由器数据全量写opentsdb
+        routerProcess.addSink(new PSinkToOpentsdb(opentsdb_url));
+    }
+
+    private static void winDataProcess(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, TimesConstats build) {
         SingleOutputStreamOperator<DataStruct> winProcess = splitStream
                 .select("Win")
                 .map(new WinMapFunction())
                 .keyBy("Host")
                 .timeWindow(Time.of(windowSizeMillis, TimeUnit.MILLISECONDS))
                 .process(new WinProcessMapFunction());
-        //机器网络是否联通
+//        机器网络是否联通
         DataStream<AlterStruct> alarmPing = getAlarmPing(winProcess, broadcast, build);
         alarmPing.addSink(new MysqlSink());
-        //windows数据全量写opentsdb
+//        windows数据全量写opentsdb
         winProcess.addSink(new PSinkToOpentsdb(opentsdb_url));
 
-        //windows数据进行告警规则判断并将告警数据写入mysql
+//        windows数据进行告警规则判断并将告警数据写入mysql
         List<DataStream<AlterStruct>> alarmWindows = getAlarm(winProcess, broadcast, build);
-
         alarmWindows.forEach(alarmDataStream -> alarmDataStream.addSink(new RedisWriter()));
     }
 
-    private static void Linux_Data_Process(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, TimesConstats build) {
+    private static void linuxDataProcess(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, TimesConstats build) {
         SingleOutputStreamOperator<DataStruct> linuxProcess = splitStream
                 .select("Linux")
                 .map(new LinuxMapFunction())
@@ -121,15 +133,14 @@ public class StreamToFlinkV3 {
                 .timeWindow(Time.of(windowSizeMillis, TimeUnit.MILLISECONDS))
                 .process(new LinuxProcessMapFunction());
 
-        //Linux数据全量写opentsdb
+//        Linux数据全量写opentsdb
         linuxProcess.addSink(new PSinkToOpentsdb(opentsdb_url));
-        //Linux数据进行告警规则判断并将告警数据写入mysql
+//        Linux数据进行告警规则判断并将告警数据写入mysql
         List<DataStream<AlterStruct>> alarmLinux = getAlarm(linuxProcess, broadcast, build);
-
         alarmLinux.forEach(alarmDataStream -> alarmDataStream.addSink(new RedisWriter()));
     }
 
-    private static void Aix_Data_Process(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, TimesConstats build) {
+    private static void aixDataProcess(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, TimesConstats build) {
         SingleOutputStreamOperator<DataStruct> aixProcess = splitStream
                 .select("Aix")
                 .map(new AixMapFunction())
@@ -137,16 +148,16 @@ public class StreamToFlinkV3 {
                 .timeWindow(Time.of(windowSizeMillis, TimeUnit.MILLISECONDS))
                 .process(new AixProcessMapFunction());
 
-        // aix指标数据写入opentsdb
+//        aix指标数据写入opentsdb
         aixProcess.addSink(new PSinkToOpentsdb(opentsdb_url));
-        //aix数据进行告警规则判断并将告警数据写入mysql
+//        aix数据进行告警规则判断并将告警数据写入mysql
         List<DataStream<AlterStruct>> alarmLinux = getAlarm(aixProcess, broadcast, build);
-        //alarmLinux.forEach(e -> e.addSink(new MysqlSink()));
+//        alarmLinux.forEach(e -> e.addSink(new MysqlSink()));
         alarmLinux.forEach(alarmDataStream -> alarmDataStream.addSink(new RedisWriter()));
     }
 
-    private static void H3c_Data_Process(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, ParameterTool parameterTool, TimesConstats build) {
-        //交换机指标数据处理
+    private static void h3cDataProcess(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, ParameterTool parameterTool, TimesConstats build) {
+//        交换机指标数据处理
         SingleOutputStreamOperator<DataStruct> H3C_Switch = splitStream
                 .select("H3C_Switch")
                 .map(new H3cMapFunction())
@@ -154,7 +165,7 @@ public class StreamToFlinkV3 {
                 .timeWindow(Time.of(windowSizeMillis, TimeUnit.MILLISECONDS))
                 .process(new H3CSwitchProcessMapFunction());
 
-        //板卡等信息写入到redis中
+//        板卡等信息写入到redis中
         H3C_Switch.flatMap(new FlatMapFunction<DataStruct, Tuple3<String, String, String>>() {
             @Override
             public void flatMap(DataStruct value, Collector<Tuple3<String, String, String>> out) throws Exception {
@@ -168,16 +179,16 @@ public class StreamToFlinkV3 {
             }
         }).addSink(new SinkToRedis());
 
-        //Linux数据全量写opentsdb
+//        Linux数据全量写opentsdb
         H3C_Switch.addSink(new PSinkToOpentsdb(opentsdb_url));
-        //Linux数据进行告警规则判断并将告警数据写入mysql
+//        Linux数据进行告警规则判断并将告警数据写入mysql
         List<DataStream<AlterStruct>> H3C_Switch_1 = getAlarm(H3C_Switch, broadcast, build);
-        //H3C_Switch_1.forEach(e -> e.addSink(new MysqlSink()));
+//        H3C_Switch_1.forEach(e -> e.addSink(new MysqlSink()));
         H3C_Switch_1.forEach(alarmDataStream -> alarmDataStream.addSink(new RedisWriter()));
     }
 
-    private static void ZX_Data_Process(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, ParameterTool parameterTool, TimesConstats build) {
-        //交换机指标数据处理
+    private static void zxDataProcess(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, ParameterTool parameterTool, TimesConstats build) {
+//        交换机指标数据处理
         SingleOutputStreamOperator<DataStruct> ZX_Switch = splitStream
                 .select("ZX_Switch")
                 .map(new ZXMapFunction())
@@ -185,7 +196,7 @@ public class StreamToFlinkV3 {
                 .timeWindow(Time.of(windowSizeMillis, TimeUnit.MILLISECONDS))
                 .process(new ZXSwitchProcessMapFunction());
 
-        //板卡等信息写入到redis中
+//        板卡等信息写入到redis中
         ZX_Switch.flatMap(new FlatMapFunction<DataStruct, Tuple3<String, String, String>>() {
             @Override
             public void flatMap(DataStruct value, Collector<Tuple3<String, String, String>> out) throws Exception {
@@ -199,16 +210,16 @@ public class StreamToFlinkV3 {
             }
         }).addSink(new SinkToRedis());
 
-        //Linux数据全量写opentsdb
+//        Linux数据全量写opentsdb
         ZX_Switch.addSink(new PSinkToOpentsdb(opentsdb_url));
-        //Linux数据进行告警规则判断并将告警数据写入mysql
+//        Linux数据进行告警规则判断并将告警数据写入mysql
         List<DataStream<AlterStruct>> H3C_Switch_1 = getAlarm(ZX_Switch, broadcast, build);
-        //H3C_Switch_1.forEach(e -> e.addSink(new MysqlSink()));
+//        H3C_Switch_1.forEach(e -> e.addSink(new MysqlSink()));
         H3C_Switch_1.forEach(alarmDataStream -> alarmDataStream.addSink(new RedisWriter()));
     }
 
-    private static void DPI_Data_Process(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, ParameterTool parameterTool, TimesConstats build) {
-        //交换机指标数据处理
+    private static void dpiDataProcess(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, ParameterTool parameterTool, TimesConstats build) {
+//        交换机指标数据处理
         SingleOutputStreamOperator<DataStruct> DPI_Switch = splitStream
                 .select("DPI")
                 .map(new DPIMapFunction())
@@ -228,17 +239,16 @@ public class StreamToFlinkV3 {
                 }
             }
         }).addSink(new SinkToRedis());
-        //Linux数据全量写opentsdb
+//        Linux数据全量写opentsdb
         DPI_Switch.addSink(new PSinkToOpentsdb(opentsdb_url));
-        //Linux数据进行告警规则判断并将告警数据写入mysql
+//        Linux数据进行告警规则判断并将告警数据写入mysql
         List<DataStream<AlterStruct>> H3C_Switch_1 = getAlarm(DPI_Switch, broadcast, build);
-        //H3C_Switch_1.forEach(e -> e.addSink(new MysqlSink()));
+//        H3C_Switch_1.forEach(e -> e.addSink(new MysqlSink()));
         H3C_Switch_1.forEach(alarmDataStream -> alarmDataStream.addSink(new RedisWriter()));
     }
 
     static class MySQLFunction implements MapFunction<Map<String, Tuple9<String, String, String, Double, Double, Double, Double, String, String>>, Map<String, String>> {
-        //(445,10.3.1.6,101_101_106_103,50.0,null,null,null)
-
+        //        (445,10.3.1.6,101_101_106_103,50.0,null,null,null)
         @Override
         public Map<String, String> map(Map<String, Tuple9<String, String, String, Double, Double, Double, Double, String, String>> event) throws Exception {
             Map<String, String> map = new HashMap<>();
