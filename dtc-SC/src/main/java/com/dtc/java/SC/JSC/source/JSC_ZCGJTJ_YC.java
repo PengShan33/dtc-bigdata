@@ -42,19 +42,19 @@ public class JSC_ZCGJTJ_YC extends RichSourceFunction<Tuple3<String,Integer,Inte
 //                    "left join asset_category_mapping c on c.asset_id=b.asset_id) d left join asset_category e on e.id = d.asset_category_id) f left join asset_category j on j.id=f.parent_id) l on k.name = l.name where k.parent_id=0";
 
             String sql = "select\n" +
-                    "ifnull(c.name,'其他') as name,\n" +
-                    "count(a.asset_id) as num\n" +
+                    "ifnull(b.name,'其他') as name,\n" +
+                    "count(c.asset_id) as num\n" +
                     "from\n" +
-                    "(select asset_id from alarm where TO_DAYS(now())=to_days(time_occur) group by asset_id)a\n" +
-                    "left join\n" +
-                    "(select asset_id,category_id,parent_category_id from t_assalarm_asset  where removed = 0 group by asset_id,category_id,parent_category_id)b\n" +
-                    "on a.asset_id = b.asset_id\n" +
+                    "(select asset_id,category_id,parent_category_id from t_assalarm_asset  where removed = 0 group by asset_id,category_id,parent_category_id)a\n" +
                     "left join\n" +
                     "(\n" +
-                    "\tselect id,name from t_assalarm_asset_category where removed = 0\n" +
-                    ")c\n" +
-                    "on b.parent_category_id = c.id\n" +
-                    "group by c.name";
+                    "select id,name from t_assalarm_asset_category where removed = 0\n" +
+                    ")b\n" +
+                    "on a.parent_category_id = b.id\n" +
+                    "left join\n" +
+                    "(select asset_id from alarm where TO_DAYS(now())=to_days(time_occur) and asset_id is  not  null group by asset_id)c\n" +
+                    "on c.asset_id = a.asset_id\n" +
+                    "group by b.name";
 
             ps = connection.prepareStatement(sql);
         }

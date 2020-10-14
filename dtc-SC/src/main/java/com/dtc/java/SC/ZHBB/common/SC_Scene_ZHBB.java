@@ -39,7 +39,7 @@ public class SC_Scene_ZHBB {
                 "FROM\n" +
                 "t_assalarm_asset\n" +
                 "WHERE\n" +
-                "item_code = 'manufacturer'\n" +
+                "item_code = 'manufacturer' and removed = 0\n" +
                 "GROUP BY\n" +
                 "sblx,\n" +
                 "zlx,\n" +
