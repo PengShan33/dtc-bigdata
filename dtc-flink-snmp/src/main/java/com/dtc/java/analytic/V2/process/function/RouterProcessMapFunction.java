@@ -117,7 +117,7 @@ public class RouterProcessMapFunction extends ProcessWindowFunction<DataStruct, 
             long inErrorsNum = 0;
             String systemName = null;
             String host = null;
-            String zbFourName = "103_101_101_106_106";
+            String zbFourName = "104_101_101_106_106";
             String zbLastCode = "";
             String nameCn = "端口入方向错误包总计";
             String nameEn = "router_in_errors_total";
@@ -144,7 +144,7 @@ public class RouterProcessMapFunction extends ProcessWindowFunction<DataStruct, 
             long outErrorsNum = 0;
             String systemName = null;
             String host = null;
-            String zbFourName = "103_101_101_107_107";
+            String zbFourName = "104_101_101_107_107";
             String zbLastCode = "";
             String nameCn = "端口出方向错误包总计";
             String nameEn = "router_out_errors_total";
@@ -171,7 +171,7 @@ public class RouterProcessMapFunction extends ProcessWindowFunction<DataStruct, 
             double inOctetsSize = 0;
             String systemName = null;
             String host = null;
-            String zbFourName = "103_101_101_108_108";
+            String zbFourName = "104_101_101_108_108";
             String zbLastCode = "";
             String nameCn = "端口入方向流量统计";
             String nameEn = "router_in_octets_total";
@@ -199,7 +199,7 @@ public class RouterProcessMapFunction extends ProcessWindowFunction<DataStruct, 
             double outOctetsSize = 0;
             String systemName = null;
             String host = null;
-            String zbFourName = "103_101_101_109_109";
+            String zbFourName = "104_101_101_109_109";
             String zbLastCode = "";
             String nameCn = "端口出方向流量统计";
             String nameEn = "router_out_octets_total";
