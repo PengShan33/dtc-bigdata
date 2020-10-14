@@ -53,6 +53,8 @@ public class MainUntils {
                 output.add("ZX_Switch");
             } else if ("103_102".equals(type)) {
                 output.add("DPI");
+            } else if ("103_101".equals(type)) {
+                output.add("Router");
             }
             return output;
         });
