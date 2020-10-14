@@ -1,9 +1,9 @@
 package com.dtc.java.analytic.V2.enums;
 
 /**
- * @author wh
+ * @author
  */
-public enum CodeTypeEnum {
+public enum AixCodeTypeEnum {
 
     /**
      * 指标编码
@@ -36,7 +36,7 @@ public enum CodeTypeEnum {
      */
     private String desc;
 
-    CodeTypeEnum(String code, String desc) {
+    AixCodeTypeEnum(String code, String desc) {
         this.code = code;
         this.desc = desc;
     }
@@ -45,7 +45,7 @@ public enum CodeTypeEnum {
         return code;
     }
 
-    public CodeTypeEnum setCode(String code) {
+    public AixCodeTypeEnum setCode(String code) {
         this.code = code;
         return this;
     }
@@ -54,7 +54,7 @@ public enum CodeTypeEnum {
         return desc;
     }
 
-    public CodeTypeEnum setDesc(String desc) {
+    public AixCodeTypeEnum setDesc(String desc) {
         this.desc = desc;
         return this;
     }

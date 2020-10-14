@@ -1,7 +1,7 @@
 package com.dtc.java.analytic.V2.process.function;
 
 import com.dtc.java.analytic.V2.common.model.DataStruct;
-import com.dtc.java.analytic.V2.enums.CodeTypeEnum;
+import com.dtc.java.analytic.V2.enums.AixCodeTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.java.tuple.Tuple;
@@ -28,7 +28,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
     private final Long kb2GbUnit = 1024 * 1024L;
 
     /**
-     * bytes转换为gb单位
+     * byte转换为gb单位
      */
     private final Long bytes2GbUnit = 1024 * 1024 * 1024L;
     /**
@@ -95,13 +95,13 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 log.info("value is not number of string!" + element.getValue());
             } else {
                 //主机系统参数：系统启动时间，后端判断在离线
-                if (CodeTypeEnum.AIX_SYSTEM_UP_TIME.getCode().equals(element.getZbFourName())) {
+                if (AixCodeTypeEnum.AIX_SYSTEM_UP_TIME.getCode().equals(element.getZbFourName())) {
                     out.collect(new DataStruct(element.getSystem_name(), element.getHost(), element.getZbFourName(), element.getZbLastCode(), element.getNameCN(), element.getNameEN(), element.getTime(), element.getValue()));
                     continue;
                 }
 
                 // cpu使用率,直接使用
-                if (CodeTypeEnum.AIX_SECPU_UTILIZATION.getCode().equals(element.getZbFourName())) {
+                if (AixCodeTypeEnum.AIX_SECPU_UTILIZATION.getCode().equals(element.getZbFourName())) {
                     String cpuUsedRate;
                     String value = element.getValue();
                     if (StringUtils.isEmpty(value)) {
@@ -114,7 +114,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 }
 
                 //内存总大小,KB转换为GB
-                if (CodeTypeEnum.AIX_MEMORY_SIZE.getCode().equals(element.getZbFourName())) {
+                if (AixCodeTypeEnum.AIX_MEMORY_SIZE.getCode().equals(element.getZbFourName())) {
                     memTotalSize = Double.parseDouble(element.getValue()) / kb2GbUnit;
                     String value = Double.parseDouble(element.getValue()) / kb2GbUnit + "";
                     element.setValue(value);
@@ -123,7 +123,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 }
 
                 //每个分区簇的大小,单位Bytes
-                if (CodeTypeEnum.AIX_STORAGE_ALLOCATION_UNITS.getCode().equals(element.getZbFourName())) {
+                if (AixCodeTypeEnum.AIX_STORAGE_ALLOCATION_UNITS.getCode().equals(element.getZbFourName())) {
                     String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
                     String value = element.getValue();
                     cuSize.put(key, value);
@@ -131,7 +131,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 }
 
                //每个分区簇的数目
-                if (CodeTypeEnum.AIX_STORAGE_SIZE.getCode().equals(element.getZbFourName())) {
+                if (AixCodeTypeEnum.AIX_STORAGE_SIZE.getCode().equals(element.getZbFourName())) {
                     String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
                     String value = element.getValue();
                     cuNum.put(key, value);
@@ -139,7 +139,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 }
 
                 //每个分区已使用的簇的数目
-                if (CodeTypeEnum.AIX_STORAGE_USED.getCode().equals(element.getZbFourName())) {
+                if (AixCodeTypeEnum.AIX_STORAGE_USED.getCode().equals(element.getZbFourName())) {
                     String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
                     String value = element.getValue();
                     cuUsedNum.put(key, value);
@@ -147,7 +147,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 }
 
                 //每个分区磁盘大小
-                if (CodeTypeEnum.AIX_FS_SIZE.getCode().equals(element.getZbFourName())) {
+                if (AixCodeTypeEnum.AIX_FS_SIZE.getCode().equals(element.getZbFourName())) {
                     String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
                     String value = element.getValue();
                     diskBlockSize.put(key, value);
@@ -155,7 +155,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 }
 
                 //每个分区磁盘剩余大小
-                if (CodeTypeEnum.AIX_FS_FREE.getCode().equals(element.getZbFourName())) {
+                if (AixCodeTypeEnum.AIX_FS_FREE.getCode().equals(element.getZbFourName())) {
                     String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
                     String value = element.getValue();
                     diskFreeBlockSize.put(key, value);
@@ -163,7 +163,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 }
 
                 //接收错误报文数
-                if (CodeTypeEnum.AIX_IN_ERRORS.getCode().equals(element.getZbFourName())) {
+                if (AixCodeTypeEnum.AIX_IN_ERRORS.getCode().equals(element.getZbFourName())) {
                     String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
                     String value = element.getValue();
                     inErrorsMap.put(key, value);
@@ -171,7 +171,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 }
 
                 //发送错误报文数
-                if (CodeTypeEnum.AIX_OUT_ERRORS.getCode().equals(element.getZbFourName())) {
+                if (AixCodeTypeEnum.AIX_OUT_ERRORS.getCode().equals(element.getZbFourName())) {
                     String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
                     String value = element.getValue();
                     outErrorsMap.put(key, value);
@@ -179,7 +179,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 }
 
                 //接收到的单播报文数
-                if (CodeTypeEnum.AIX_IN_UCAST_PKTS.getCode().equals(element.getZbFourName())) {
+                if (AixCodeTypeEnum.AIX_IN_UCAST_PKTS.getCode().equals(element.getZbFourName())) {
                     String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
                     String value = element.getValue();
                     inUcastPktsMap.put(key, value);
@@ -187,7 +187,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 }
 
                 //接收到的非单播报文数
-                if (CodeTypeEnum.AIX_IN_NUCAST_PKTS.getCode().equals(element.getZbFourName())) {
+                if (AixCodeTypeEnum.AIX_IN_NUCAST_PKTS.getCode().equals(element.getZbFourName())) {
                     String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
                     String value = element.getValue();
                     inNUcastPktsMap.put(key, value);
@@ -195,7 +195,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 }
 
                 //发送的单播报文数
-                if (CodeTypeEnum.AIX_OUT_UCAST_PKTS.getCode().equals(element.getZbFourName())) {
+                if (AixCodeTypeEnum.AIX_OUT_UCAST_PKTS.getCode().equals(element.getZbFourName())) {
                     String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
                     String value = element.getValue();
                     outUcastPktsMap.put(key, value);
@@ -203,7 +203,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 }
 
                 //发送的非单播报文数
-                if (CodeTypeEnum.AIX_OUT_NUCAST_PKTS.getCode().equals(element.getZbFourName())) {
+                if (AixCodeTypeEnum.AIX_OUT_NUCAST_PKTS.getCode().equals(element.getZbFourName())) {
                     String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
                     String value = element.getValue();
                     outNUcastPktsMap.put(key, value);
@@ -211,7 +211,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 }
 
                 //端口入流量
-                if (CodeTypeEnum.AIX_IN_OCTETS.getCode().equals(element.getZbFourName())) {
+                if (AixCodeTypeEnum.AIX_IN_OCTETS.getCode().equals(element.getZbFourName())) {
                     String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
                     String value = element.getValue();
                     inOctetsMap.put(key, value);
@@ -219,7 +219,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                 }
 
                 //端口出流量
-                if (CodeTypeEnum.AIX_OUT_OCTETS.getCode().equals(element.getZbFourName())) {
+                if (AixCodeTypeEnum.AIX_OUT_OCTETS.getCode().equals(element.getZbFourName())) {
                     String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
                     String value = element.getValue();
                     outOctetsMap.put(key, value);
