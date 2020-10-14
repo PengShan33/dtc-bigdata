@@ -54,7 +54,7 @@ public class MainUntils {
             } else if ("103_102".equals(type)) {
                 output.add("DPI");
             } else if ("104_101".equals(type)) {
-                output.add("Router");
+                output.add("H3c_Router");
             }
             return output;
         });
