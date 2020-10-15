@@ -1,4 +1,4 @@
-package com.dtc.java.analytic.V2.source.test;
+package com.dtc.analytic.source.test;
 
 import com.alibaba.fastjson.JSON;
 import com.dtc.java.analytic.V2.common.model.SourceEvent;

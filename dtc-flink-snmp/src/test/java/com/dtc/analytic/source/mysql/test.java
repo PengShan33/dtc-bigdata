@@ -1,4 +1,4 @@
-//package com.dtc.java.analytic.V2.source.mysql;
+package com.dtc.analytic.source.mysql;//package com.dtc.java.analytic.V2.source.mysql;
 //
 //import com.dtc.java.analytic.V2.common.model.DataStruct;
 //import com.dtc.java.analytic.V2.common.utils.ExecutionEnvUtil;

@@ -1,10 +1,10 @@
-package com.dtc.java.analytic.V2.common.constant;
+package com.dtc.analytic.source.test;
 
 
+import com.dtc.java.analytic.V2.common.constant.DtcPeriodicAssigner;
 import com.dtc.java.analytic.V2.common.model.DataStruct;
 import com.dtc.java.analytic.V2.common.model.SourceEvent;
 import com.dtc.java.analytic.V2.common.utils.ExecutionEnvUtil;
-import com.dtc.java.analytic.V2.source.test.TestSourceEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.FilterFunction;

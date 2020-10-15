@@ -1,4 +1,4 @@
-package com.dtc.java.analytic.V2.source.mysql;
+package com.dtc.analytic.source.mysql;
 
 /**
  * @Author : lihao
@@ -12,13 +12,15 @@ class father{
         System.out.println("name ="+name+",age ="+age);
     }
 }
-class son extends father{
+
+class son extends father {
     public String name = "儿子";
     public int age =5;
     public void show(){
         System.out.println("name ="+name+",age ="+age);
     }
 }
+
 public class test1 {
     public static void main(String[] args) {
         father fa = new son();

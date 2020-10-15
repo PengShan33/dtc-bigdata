@@ -1,4 +1,4 @@
-package com.dtc.java.analytic.V2.source.test;
+package com.dtc.analytic.source.test;
 
 /**
  * Created on 2020-02-28

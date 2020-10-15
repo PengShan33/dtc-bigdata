@@ -1,4 +1,4 @@
-package com.dtc.java.analytic.V2.source.mysql;
+package com.dtc.analytic.source.mysql;
 
 
 import com.dtc.java.analytic.V1.alter.MySQLUtil;
