@@ -43,7 +43,7 @@ public class PSinkToOpentsdb extends RichSinkFunction<DataStruct> {
             //转为保留两位小数
             java.text.DecimalFormat df = new java.text.DecimalFormat("#.##");
             double result = Double.parseDouble(df.format(Double.parseDouble(value.getValue())));
-            if (value.getSystem_name().contains("h3c")) {
+            if (value.getSystem_name().contains("h3c_switch")) {
                 long l = System.currentTimeMillis();
                 String metircs = metric + "-" + host + "-" + id;
                 //华三交换机存储opentsdb策略
@@ -51,7 +51,7 @@ public class PSinkToOpentsdb extends RichSinkFunction<DataStruct> {
                         .setDataPoint(time, result)
                         .addTag("type", "h3c_swtich")
                         .addTag("host", host);
-            } else if (value.getSystem_name().contains("zx")) {
+            } else if (value.getSystem_name().contains("zx_swtich")) {
                 String metircs = metric + "-" + host + "-" + id;
                 long l = System.currentTimeMillis();
                 //中兴交换机存储opentsdb策略
@@ -67,28 +67,33 @@ public class PSinkToOpentsdb extends RichSinkFunction<DataStruct> {
                         .setDataPoint(time, result)
                         .addTag("type", "dpi")
                         .addTag("host", host);
-            }else if(value.getSystem_name().contains("win")){
-                if(id.isEmpty()){
+            } else if (value.getSystem_name().contains("win")) {
+                if (id.isEmpty()) {
                     String metircs = metric + "-" + host;
                     builder.addMetric(metircs)
                             .setDataPoint(time, result)
                             .addTag("type", "win")
                             .addTag("host", host);
-                }else {
-                    String metircs = metric + "-" + id+ "-" + host ;
+                } else {
+                    String metircs = metric + "-" + id + "-" + host;
                     builder.addMetric(metircs)
                             .setDataPoint(time, result)
                             .addTag("type", "win")
                             .addTag("lastcode", id)
                             .addTag("host", host);
                 }
-            } else if (value.getSystem_name().contains("aix")){
+            } else if (value.getSystem_name().contains("aix")) {
                 builder.addMetric(metric + "-" + host)
                         .setDataPoint(time, result)
                         .addTag("type", "aix")
                         .addTag("host", host);
-            }
-            else {
+            } else if (value.getSystem_name().contains("h3c_router")) {
+                String metircs = metric + "-" + host + "-" + id;
+                builder.addMetric(metircs)
+                        .setDataPoint(time, result)
+                        .addTag("type", "h3c_router")
+                        .addTag("host", host);
+            } else {
                 builder.addMetric(metric + "-" + host)
                         .setDataPoint(time, result)
                         .addTag("host", host);

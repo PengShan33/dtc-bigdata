@@ -20,7 +20,7 @@ public class ZXMapFunction implements MapFunction<DataStruct, DataStruct> {
             if ("102_103_101_101_101".equals(lastCode) || "102_103_101_102_102".equals(lastCode) || "102_103_102_103_103".equals(lastCode)) {
                 String nameCode = LastCode.split("\\.", 2)[1];
                 //板卡
-                return new DataStruct(event.getSystem_name() + "|zx_0", event.getHost(), lastCode, nameCode, event.getNameCN(), event.getNameEN(), event.getTime(), event.getValue());
+                return new DataStruct(event.getSystem_name() + "|zx_swtich_0", event.getHost(), lastCode, nameCode, event.getNameCN(), event.getNameEN(), event.getTime(), event.getValue());
 
             }
             if ("102_103_103_105_105".equals(lastCode) || "102_103_103_106_106".equals(lastCode) ||
@@ -28,9 +28,9 @@ public class ZXMapFunction implements MapFunction<DataStruct, DataStruct> {
                     || "102_103_103_110_110".equals(lastCode)) {
                 String nameCode = LastCode.split("\\.", 2)[1];
                 //端口
-                return new DataStruct(event.getSystem_name() + "|zx_1", event.getHost(), lastCode, nameCode, event.getNameCN(), event.getNameEN(), event.getTime(), event.getValue());
+                return new DataStruct(event.getSystem_name() + "|zx_swtich_1", event.getHost(), lastCode, nameCode, event.getNameCN(), event.getNameEN(), event.getTime(), event.getValue());
             }
         }
-        return new DataStruct(event.getSystem_name() + "|zx_2", event.getHost(), event.getZbFourName() + "_" + event.getZbLastCode(), "", event.getNameCN(), event.getNameEN(), event.getTime(), event.getValue());
+        return new DataStruct(event.getSystem_name() + "|zx_swtich_2", event.getHost(), event.getZbFourName() + "_" + event.getZbLastCode(), "", event.getNameCN(), event.getNameEN(), event.getTime(), event.getValue());
     }
 }
