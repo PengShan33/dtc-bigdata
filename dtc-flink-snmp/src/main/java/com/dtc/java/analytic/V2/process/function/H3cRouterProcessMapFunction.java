@@ -19,30 +19,16 @@ import java.util.Map;
 @Slf4j
 public class H3cRouterProcessMapFunction extends ProcessWindowFunction<DataStruct, DataStruct, Tuple, TimeWindow> {
 
-    /**
-     * byte转换为gb单位
-     */
-    private final Long bytes2GbUnit = 1024 * 1024 * 1024L;
 
     /**
-     * 获取端口入方向错包数
+     * 获取所有端口数量
      */
-    private Map<String, String> inErrorsMap = new HashMap<>(100);
+    private Map<String, String> operNumMap = new HashMap<>(100);
 
     /**
-     * 获取端口出方向错包数
+     * 获取所有单板数量
      */
-    private Map<String, String> outErrorsMap = new HashMap<>(100);
-
-    /**
-     * 获取端口入方向字节数
-     */
-    private Map<String, String> inOctetsMap = new HashMap<>(100);
-
-    /**
-     * 获取端口出方向字节数
-     */
-    private Map<String, String> outOctetsMap = new HashMap<>(100);
+    private Map<String, String> slotNumMap = new HashMap<>(100);
 
     @Override
     public void process(Tuple tuple, Context context, Iterable<DataStruct> iterable, Collector<DataStruct> collector) throws Exception {
@@ -54,166 +40,90 @@ public class H3cRouterProcessMapFunction extends ProcessWindowFunction<DataStruc
             if (!strResult) {
                 log.info("Value is not number of string!");
             } else {
-                if (RouterCodeTypeEnum.ROUTER_CPU_USAGE.getCode().equals(code) ||
-                        RouterCodeTypeEnum.ROUTER_MEM_USAGE.getCode().equals(code) ||
-                        RouterCodeTypeEnum.ROUTER_OPER_STATUS.getCode().equals(code) ||
-                        RouterCodeTypeEnum.ROUTER_SLOT_CPURATIO.getCode().equals(code) ||
-                        RouterCodeTypeEnum.ROUTER_SLOT_MEMRATIO.getCode().equals(code) ||
-                        RouterCodeTypeEnum.ROUTER_SYS_CPURATIO.getCode().equals(code) ||
-                        RouterCodeTypeEnum.ROUTER_SYS_MEMRATIO.getCode().equals(code)) {
-
+                if (RouterCodeTypeEnum.ROUTER_SLOT_MEMRATIO.getCode().equals(code)) {
                     collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), in.getValue()));
                     continue;
 
                 }
 
-                if (RouterCodeTypeEnum.ROUTER_IN_ERRORS.getCode().equals(code)) {
+                if (RouterCodeTypeEnum.ROUTER_OPER_STATUS.getCode().equals(code)) {
                     String key = in.getHost() + "-" + in.getZbFourName() + "-" + in.getZbLastCode();
                     String value = in.getValue();
-                    inErrorsMap.put(key, value);
+                    operNumMap.put(key, value);
+                    collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), in.getValue()));
                     continue;
                 }
 
-                if (RouterCodeTypeEnum.ROUTER_OUT_ERRORS.getCode().equals(code)) {
+                if (RouterCodeTypeEnum.ROUTER_SLOT_CPURATIO.getCode().equals(code)) {
                     String key = in.getHost() + "-" + in.getZbFourName() + "-" + in.getZbLastCode();
                     String value = in.getValue();
-                    outErrorsMap.put(key, value);
+                    slotNumMap.put(key, value);
+                    collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), in.getValue()));
                     continue;
                 }
 
-                if (RouterCodeTypeEnum.ROUTER_HCIN_OCTETS.getCode().equals(code)) {
-                    String key = in.getHost() + "-" + in.getZbFourName() + "-" + in.getZbLastCode();
-                    String value = in.getValue();
-                    inOctetsMap.put(key, value);
-                    continue;
-                }
-
-                if (RouterCodeTypeEnum.ROUTER_HCOUT_OCTETS.getCode().equals(code)) {
-                    String key = in.getHost() + "-" + in.getZbFourName() + "-" + in.getZbLastCode();
-                    String value = in.getValue();
-                    outOctetsMap.put(key, value);
-                    continue;
-                }
             }
         }
-        // 获取端口入方向错包数
-        inErrorsProcess(collector);
-        // 获取端口出方向错包数
-        outErrorsProcess(collector);
-        // 获取端口入方向字节数
-        inOctetsProcess(collector);
-        // 获取端口出方向字节数
-        outOctetsProcess(collector);
+        // 获取所有端口数量
+        operNumProcess(collector);
+        // 获取所有单板数量
+        slotNumProcess(collector);
     }
 
 
     /**
-     * 获取端口入方向错包数处理
+     * 获取所有端口数量
      *
      * @param collector
      */
-    private void inErrorsProcess(Collector<DataStruct> collector) {
-        if (isNotEmpty(inErrorsMap)) {
-            long inErrorsNum = 0;
+    private void operNumProcess(Collector<DataStruct> collector) {
+        if (isNotEmpty(operNumMap)) {
+            long operNum = 0;
             String systemName = null;
             String host = null;
-            String zbFourName = "104_101_101_106_106";
+            String zbFourName = "104_101_101_110_110";
             String zbLastCode = "";
-            String nameCn = "端口入方向错误包总计";
-            String nameEn = "router_in_errors_total";
+            String nameCn = "所有端口数量";
+            String nameEn = "router_oper_num";
             String time = String.valueOf(System.currentTimeMillis());
-            for (String key : inErrorsMap.keySet()) {
+
+            for (String key : operNumMap.keySet()) {
                 String[] split = key.split("-");
                 host = split[0];
                 systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|h3c_router";
-                inErrorsNum += Long.parseLong(inErrorsMap.get(key));
+                operNum++;
             }
-            String value = String.valueOf(inErrorsNum);
+
+            String value = String.valueOf(operNum);
             collector.collect(new DataStruct(systemName, host, zbFourName, zbLastCode, nameCn, nameEn, time, value));
-            inErrorsMap.clear();
+            operNumMap.clear();
         }
     }
 
     /**
-     * 获取端口出方向错包数处理
+     * 获取所有单板数量
      *
      * @param collector
      */
-    private void outErrorsProcess(Collector<DataStruct> collector) {
-        if (isNotEmpty(outErrorsMap)) {
-            long outErrorsNum = 0;
+    private void slotNumProcess(Collector<DataStruct> collector) {
+        if (isNotEmpty(slotNumMap)) {
+            long slotNum = 0;
             String systemName = null;
             String host = null;
-            String zbFourName = "104_101_101_107_107";
+            String zbFourName = "104_101_102_104_104";
             String zbLastCode = "";
-            String nameCn = "端口出方向错误包总计";
-            String nameEn = "router_out_errors_total";
+            String nameCn = "所有单板数量";
+            String nameEn = "router_slot_num";
             String time = String.valueOf(System.currentTimeMillis());
-            for (String key : outErrorsMap.keySet()) {
+            for (String key : slotNumMap.keySet()) {
                 String[] split = key.split("-");
                 host = split[0];
                 systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|h3c_router";
-                outErrorsNum += Long.parseLong(outErrorsMap.get(key));
+                slotNum++;
             }
-            String value = String.valueOf(outErrorsNum);
+            String value = String.valueOf(slotNum);
             collector.collect(new DataStruct(systemName, host, zbFourName, zbLastCode, nameCn, nameEn, time, value));
-            outErrorsMap.clear();
-        }
-    }
-
-    /**
-     * 获取端口入方向字节数处理
-     *
-     * @param collector
-     */
-    private void inOctetsProcess(Collector<DataStruct> collector) {
-        if (isNotEmpty(inOctetsMap)) {
-            double inOctetsSize = 0;
-            String systemName = null;
-            String host = null;
-            String zbFourName = "104_101_101_108_108";
-            String zbLastCode = "";
-            String nameCn = "端口入方向流量统计";
-            String nameEn = "router_in_octets_total";
-            String time = String.valueOf(System.currentTimeMillis());
-            for (String key : inOctetsMap.keySet()) {
-                String[] split = key.split("-");
-                host = split[0];
-                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|h3c_router";
-
-                inOctetsSize += Double.parseDouble(inOctetsMap.get(key));
-            }
-            String value = inOctetsSize / bytes2GbUnit + "";
-            collector.collect(new DataStruct(systemName, host, zbFourName, zbLastCode, nameCn, nameEn, time, value));
-            inOctetsMap.clear();
-        }
-    }
-
-    /**
-     * 获取端口出方向字节数处理
-     *
-     * @param collector
-     */
-    private void outOctetsProcess(Collector<DataStruct> collector) {
-        if (isNotEmpty(outOctetsMap)) {
-            double outOctetsSize = 0;
-            String systemName = null;
-            String host = null;
-            String zbFourName = "104_101_101_109_109";
-            String zbLastCode = "";
-            String nameCn = "端口出方向流量统计";
-            String nameEn = "router_out_octets_total";
-            String time = String.valueOf(System.currentTimeMillis());
-            for (String key : outOctetsMap.keySet()) {
-                String[] split = key.split("-");
-                host = split[0];
-                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|h3c_router";
-
-                outOctetsSize += Double.parseDouble(outOctetsMap.get(key));
-            }
-            String value = outOctetsSize / bytes2GbUnit + "";
-            collector.collect(new DataStruct(systemName, host, zbFourName, zbLastCode, nameCn, nameEn, time, value));
-            outOctetsMap.clear();
+            slotNumMap.clear();
         }
     }
 
