@@ -91,11 +91,11 @@ public class StreamToFlinkV3 {
 //        dpi设备
         dpiDataProcess(opentsdb_url, windowSizeMillis, broadcast, splitStream, parameterTool, build);
 //        路由器
-        routerDataProcess(opentsdb_url, windowSizeMillis, broadcast, splitStream, parameterTool, build);
+        h3cRouterDataProcess(opentsdb_url, windowSizeMillis, broadcast, splitStream, parameterTool, build);
         env.execute("Dtc-Alarm-Flink-Process");
     }
 
-    private static void routerDataProcess(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, ParameterTool parameterTool, TimesConstats build) {
+    private static void h3cRouterDataProcess(String opentsdb_url, int windowSizeMillis, BroadcastStream<Map<String, String>> broadcast, SplitStream<DataStruct> splitStream, ParameterTool parameterTool, TimesConstats build) {
         SingleOutputStreamOperator<DataStruct> routerProcess = splitStream
                 .select("H3c_Router")
                 .map(new H3cRouterMapFunction())

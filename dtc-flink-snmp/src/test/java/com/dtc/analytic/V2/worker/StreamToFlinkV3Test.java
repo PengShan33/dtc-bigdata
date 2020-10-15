@@ -1,4 +1,4 @@
-package com.dtc.java.analytic.V2.worker;
+package java.com.dtc.analytic.V2.worker;
 
 import com.dtc.java.analytic.V2.common.model.AlterStruct;
 import com.dtc.java.analytic.V2.common.model.DataStruct;
@@ -9,6 +9,7 @@ import com.dtc.java.analytic.V2.map.function.WinMapFunction;
 import com.dtc.java.analytic.V2.process.function.LinuxProcessMapFunction;
 import com.dtc.java.analytic.V2.process.function.WinProcessMapFunction;
 import com.dtc.java.analytic.V2.process.function.alarmConvergence;
+import com.dtc.java.analytic.V2.worker.StreamToFlinkV3;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.MapFunction;

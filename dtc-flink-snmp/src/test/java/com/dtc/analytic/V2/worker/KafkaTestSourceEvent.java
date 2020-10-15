@@ -1,4 +1,4 @@
-package com.dtc.java.analytic.V2.worker;
+package java.com.dtc.analytic.V2.worker;
 
 import com.alibaba.fastjson.JSON;
 import com.dtc.java.analytic.V2.common.model.SourceEvent;
