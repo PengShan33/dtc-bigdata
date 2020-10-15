@@ -35,7 +35,11 @@ public class JSC_Alarm_level extends RichSourceFunction<Tuple2<String,Integer>> 
         interval_time = Long.parseLong(parameterTool.get(PropertiesConstants.INTERVAL_TIME).trim());
         connection = MySQLUtil.getConnection(parameterTool);
         if (connection != null) {
-            String sql = "SELECT a.level_id,count(*) as AllNum FROM alarm a where TO_DAYS(a.time_occur) = TO_DAYS(NOW()) group by a.level_id having a.level_id!=\"\"";
+            //String sql = "SELECT a.level_id,count(*) as AllNum FROM alarm a where TO_DAYS(a.time_occur) = TO_DAYS(NOW()) group by a.level_id having a.level_id!=\"\"";
+
+            String sql = "SELECT level_id,count(1) as AllNum FROM alarm  \n" +
+                    "where TO_DAYS(time_occur) = TO_DAYS(NOW()) and level_id is not null\n" +
+                    "group by level_id";
             ps = connection.prepareStatement(sql);
         }
     }

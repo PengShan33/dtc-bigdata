@@ -41,18 +41,18 @@ public class DaPing_ZCGJFL_30 extends RichSourceFunction<Tuple3<String,String,In
 //                    "left join asset_category c on c.id = a.asset_category_id left join alarm on alarm.asset_id= a.asset_id and TO_DAYSAYS(alarm.time_occur) = TO_DAYS(NOW())) m left join asset_category y on m.pd=y.id) n group by n.p_name,n.level_id having n.level_id!=\"\"";
 
             //资源资产重构
-            String sql = "select ifnull(c.name,'其他') as name,a.level_id,count(1) as AllNum \n" +
+            String sql = "select ifnull(c.name,'其他') as name,a.level_id,count(1) as AllNum\n" +
                     "from\n" +
                     "(\n" +
-                    "select \n" +
+                    "select\n" +
                     "*\n" +
                     "from\n" +
                     "alarm\n" +
-                    "where TO_DAYS(now())=TO_DAYS(alarm.time_occur)\n" +
+                    "where TO_DAYS(now())=TO_DAYS(time_occur)\n" +
                     ")a\n" +
                     "left join\n" +
                     "(\n" +
-                    "select asset_id,parent_category_id from t_assalarm_asset where removed = 0\n" +
+                    "select asset_id,parent_category_id from t_assalarm_asset where removed = 0 group by asset_id,parent_category_id \n" +
                     ")b\n" +
                     "on a.asset_id = b.asset_id\n" +
                     "left join\n" +
