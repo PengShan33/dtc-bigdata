@@ -34,6 +34,7 @@ public class PSinkToOpentsdb extends RichSinkFunction<DataStruct> {
     public void invoke(DataStruct value) {
 
         try {
+            long start = System.currentTimeMillis();
             //写入OpenTSDB
             MetricBuilder builder = MetricBuilder.getInstance();
             String metric = value.getZbFourName();
@@ -44,7 +45,6 @@ public class PSinkToOpentsdb extends RichSinkFunction<DataStruct> {
             java.text.DecimalFormat df = new java.text.DecimalFormat("#.##");
             double result = Double.parseDouble(df.format(Double.parseDouble(value.getValue())));
             if (value.getSystem_name().contains("h3c_switch")) {
-                long l = System.currentTimeMillis();
                 String metircs = metric + "-" + host + "-" + id;
                 //华三交换机存储opentsdb策略
                 builder.addMetric(metircs)
@@ -53,7 +53,6 @@ public class PSinkToOpentsdb extends RichSinkFunction<DataStruct> {
                         .addTag("host", host);
             } else if (value.getSystem_name().contains("zx_swtich")) {
                 String metircs = metric + "-" + host + "-" + id;
-                long l = System.currentTimeMillis();
                 //中兴交换机存储opentsdb策略
                 builder.addMetric(metircs)
                         .setDataPoint(time, result)
@@ -61,7 +60,6 @@ public class PSinkToOpentsdb extends RichSinkFunction<DataStruct> {
                         .addTag("host", host);
             } else if (value.getSystem_name().contains("dpi")) {
                 String metircs = metric + "-" + host + "-" + id;
-                long l = System.currentTimeMillis();
                 //dpi存储opentsdb策略
                 builder.addMetric(metircs)
                         .setDataPoint(time, result)
@@ -75,7 +73,7 @@ public class PSinkToOpentsdb extends RichSinkFunction<DataStruct> {
                             .addTag("type", "win")
                             .addTag("host", host);
                 } else {
-                    String metircs = metric + "-" + id + "-" + host;
+                    String metircs = metric + "-" + host + "-" + id;
                     builder.addMetric(metircs)
                             .setDataPoint(time, result)
                             .addTag("type", "win")
@@ -98,10 +96,12 @@ public class PSinkToOpentsdb extends RichSinkFunction<DataStruct> {
                         .setDataPoint(time, result)
                         .addTag("host", host);
             }
-            Response response1 = httpClient.pushMetrics(builder, ExpectResponse.SUMMARY);
-            boolean success = response1.isSuccess();
+            Response response = httpClient.pushMetrics(builder, ExpectResponse.SUMMARY);
+            if (response.isSuccess()) {
+                log.info("sink data to opentsdb success,cost time {} ms", System.currentTimeMillis() - start);
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("sink data to opentsdb exception.", e);
         }
     }
 }
