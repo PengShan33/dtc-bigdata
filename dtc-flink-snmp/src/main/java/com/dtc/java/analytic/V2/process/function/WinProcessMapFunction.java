@@ -72,9 +72,9 @@ public class WinProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
         for (DataStruct wc : iterable) {
             String keyValue = wc.getHost() + "_" + wc.getZbLastCode();
 
-            //主机系统参数：系统启动时间，后端判断在离线
+            //主机系统参数：系统启动时间，后端判断在离线(默认给数字1，opents里存储数值型)
             if ("101_100_105_102_102".equals(wc.getZbFourName())) {
-                collector.collect(new DataStruct(wc.getSystem_name(), wc.getHost(), wc.getZbFourName(), wc.getZbLastCode(), wc.getNameCN(), wc.getNameEN(), wc.getTime(), wc.getValue()));
+                collector.collect(new DataStruct(wc.getSystem_name(), wc.getHost(), wc.getZbFourName(), wc.getZbLastCode(), wc.getNameCN(), wc.getNameEN(), wc.getTime(), "1"));
                 continue;
             }
 

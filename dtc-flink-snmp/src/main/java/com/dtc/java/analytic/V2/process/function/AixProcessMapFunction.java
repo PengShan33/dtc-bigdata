@@ -94,9 +94,9 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
             if (!result) {
                 log.info("value is not number of string!" + element.getValue());
             } else {
-                //主机系统参数：系统启动时间，后端判断在离线
+                //主机系统参数：系统启动时间，后端判断在离线(默认给数字1，opents里存储数值型)
                 if (AixCodeTypeEnum.AIX_SYSTEM_UP_TIME.getCode().equals(element.getZbFourName())) {
-                    out.collect(new DataStruct(element.getSystem_name(), element.getHost(), element.getZbFourName(), element.getZbLastCode(), element.getNameCN(), element.getNameEN(), element.getTime(), element.getValue()));
+                    out.collect(new DataStruct(element.getSystem_name(), element.getHost(), element.getZbFourName(), element.getZbLastCode(), element.getNameCN(), element.getNameEN(), element.getTime(), "1"));
                     continue;
                 }
 
@@ -130,7 +130,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                     continue;
                 }
 
-               //每个分区簇的数目
+                //每个分区簇的数目
                 if (AixCodeTypeEnum.AIX_STORAGE_SIZE.getCode().equals(element.getZbFourName())) {
                     String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
                     String value = element.getValue();

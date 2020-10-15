@@ -55,9 +55,9 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
                 log.info("value is not number of string!" + in.getValue());
                 //TODO 若数据不是数值型，可以将数据存到hbse中，例如时间
             } else {
-                //主机系统参数：系统启动时间，后端判断在离线
+                //主机系统参数：系统启动时间，后端判断在离线(默认给数字1，opents里存储数值型)
                 if ("101_101_101_106_106".equals(in.getZbFourName())) {
-                    collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), in.getValue()));
+                    collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), "1"));
                     continue;
                 }
 
