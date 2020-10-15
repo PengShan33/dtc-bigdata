@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.dtc.java.analytic.V2.alarm.AlarmUntils.getAlarm;
 import static com.dtc.java.analytic.V2.alarm.PingAlarmUntils.getAlarmPing;
-import static com.dtc.java.analytic.V2.worker.untils.MainUntils.*;
+import static com.dtc.java.analytic.V2.worker.util.MainUtil.*;
 
 
 /**

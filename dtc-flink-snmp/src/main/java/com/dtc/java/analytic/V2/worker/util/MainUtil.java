@@ -1,4 +1,4 @@
-package com.dtc.java.analytic.V2.worker.untils;
+package com.dtc.java.analytic.V2.worker.util;
 
 import com.dtc.java.analytic.V2.common.constant.HBaseConstant;
 import com.dtc.java.analytic.V2.common.model.DataStruct;
@@ -33,7 +33,7 @@ import java.util.*;
  * Created on : 2020-05-26
  * @Description : TODO描述类作用
  */
-public class MainUntils {
+public class MainUtil {
 
     public static SplitStream<DataStruct> getSplit(SingleOutputStreamOperator<DataStruct> mapStream) {
         return mapStream.split((OutputSelector<DataStruct>) event -> {

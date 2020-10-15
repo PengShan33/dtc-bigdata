@@ -6,8 +6,7 @@ import com.dtc.java.analytic.V2.common.schemas.SourceEventSchema;
 import com.dtc.java.analytic.V2.common.utils.ExecutionEnvUtil;
 import com.dtc.java.analytic.V2.map.function.AixMapFunction;
 import com.dtc.java.analytic.V2.process.function.AixProcessMapFunction;
-import com.dtc.java.analytic.V2.worker.untils.MainUntils;
-import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import com.dtc.java.analytic.V2.worker.util.MainUtil;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -39,7 +38,7 @@ public class AixTest {
 
         aixSourceStream.print();
 
-        SingleOutputStreamOperator<DataStruct> aixMapStream = aixSourceStream.map(new MainUntils.MyMapFunctionV3());
+        SingleOutputStreamOperator<DataStruct> aixMapStream = aixSourceStream.map(new MainUtil.MyMapFunctionV3());
         aixMapStream.map(new AixMapFunction())
                     .keyBy("Host")
                     .timeWindow(Time.seconds(10))

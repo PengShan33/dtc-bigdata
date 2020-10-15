@@ -1,6 +1,5 @@
 package com.dtc.java.analytic.V2.sink.redis;
 
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.configuration.Configuration;
@@ -8,8 +7,6 @@ import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
-
-import static com.dtc.java.analytic.V2.worker.untils.MainUntils.writeEventToHbase;
 
 /**
  * @Author : lihao
