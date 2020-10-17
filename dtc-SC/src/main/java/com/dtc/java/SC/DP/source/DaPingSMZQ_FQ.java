@@ -48,7 +48,7 @@ public class DaPingSMZQ_FQ extends RichSourceFunction<Tuple2<Integer,Integer>> {
                     "asset_id,\n" +
                     "item_value\n" +
                     "from t_assalarm_asset \n" +
-                    "where removed = 0 and item_code = 'abandonment_date'\n" +
+                    "where removed = 0 and item_code = 'abandonment_date' and type=1 \n" +
                     ")a\n" +
                     "where now()>=DATE_SUB(item_value,INTERVAL 7 DAY) and now()<=item_value";
             ps = connection.prepareStatement(sql);
