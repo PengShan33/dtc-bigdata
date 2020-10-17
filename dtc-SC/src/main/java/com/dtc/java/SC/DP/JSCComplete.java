@@ -11,6 +11,7 @@ import com.dtc.java.SC.JSC.source.*;
 import com.dtc.java.SC.common.PropertiesConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.functions.CoGroupFunction;
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.KeySelector;
@@ -90,7 +91,17 @@ public class JSCComplete {
         SingleOutputStreamOperator<Tuple5<String, Integer, Integer, Integer, Double>> map1 = tuple4DataStream.filter(e -> e.f0 != null).map(new ZCFLTJ_MapFunctionV());
         //（名称，异常数，总数，比值，总数，已使用，异常数据，异常比）
         DataStream<Tuple8<String, Integer, Integer, Double, Integer, Integer, Integer, Double>> tuple8DataStream = YCLB_Finally_CGroup333(map, map1, windowSizeMillis).filter(e -> e.f0 != null).filter(e -> e.f5 != null);
-        tuple8DataStream.addSink(new MysqlSinkJSC_YC());
+
+        tuple8DataStream.filter(new FilterFunction<Tuple8<String, Integer, Integer, Double, Integer, Integer, Integer, Double>>() {
+            @Override
+            public boolean filter(Tuple8<String, Integer, Integer, Double, Integer, Integer, Integer, Double> tuple8) throws Exception {
+                if (!"其他".equals(tuple8.f0)) {
+                    return true;
+                }
+                return false;
+            }
+        }).addSink(new MysqlSinkJSC_YC());
+
 ////厂商设备top告警统计分析
 //        //(设备厂商id,厂商名，告警台数，总台数，flag)
         DataStreamSource<Tuple5<String, String, Integer, Integer, Integer>> tuple4DataStreamSource = env.addSource(new JSC_CSSB_TOP_GJTJFX()).setParallelism(1);
@@ -411,6 +422,7 @@ public class JSCComplete {
                 });
         return apply;
     }
+
     private static DataStream<ModelFirst> YCLB_Result_CGroup_34(
             DataStream<Tuple2<String, Integer>> grades,
             DataStream<Tuple2<String, Integer>> salaries,
@@ -465,16 +477,16 @@ public class JSCComplete {
                             ms.setLevel_4(s.getLevel_2());
                             ms.setLevel_four(s.getLevel_two());
                         }
-                        if(ms.getLevel_1()==null){
+                        if (ms.getLevel_1() == null) {
                             ms.setLevel_1("1");
                         }
-                        if(ms.getLevel_2()==null){
+                        if (ms.getLevel_2() == null) {
                             ms.setLevel_2("2");
                         }
-                        if(ms.getLevel_3()==null){
+                        if (ms.getLevel_3() == null) {
                             ms.setLevel_3("3");
                         }
-                        if(ms.getLevel_4()==null){
+                        if (ms.getLevel_4() == null) {
                             ms.setLevel_4("4");
                         }
                         collector.collect(ms);
@@ -487,9 +499,9 @@ public class JSCComplete {
     private static class YCFB_Result_KeySelector implements KeySelector<Tuple2<String, Integer>, Integer> {
         @Override
         public Integer getKey(Tuple2<String, Integer> value) {
-            if(value.f0==null){
+            if (value.f0 == null) {
                 return 1;
-            }else {
+            } else {
                 return Integer.parseInt(value.f0);
             }
         }
@@ -499,9 +511,9 @@ public class JSCComplete {
     private static class YCFB_Result_KeySelectorOne implements KeySelector<Tuple2<String, Integer>, Integer> {
         @Override
         public Integer getKey(Tuple2<String, Integer> value) {
-            if(value==null){
+            if (value == null) {
                 return 2;
-            }else {
+            } else {
                 return Integer.parseInt(value.f0) + 1;
             }
         }
@@ -510,17 +522,18 @@ public class JSCComplete {
     private static class YCFB_Result_KeySelectorOne_34 implements KeySelector<Tuple2<String, Integer>, Integer> {
         @Override
         public Integer getKey(Tuple2<String, Integer> value) {
-            if(value==null){
+            if (value == null) {
                 return 4;
-            }else {
+            } else {
                 return Integer.parseInt(value.f0) + 1;
             }
         }
     }
+
     private static class YCFB_Result_KeySelector_34 implements KeySelector<Tuple2<String, Integer>, Integer> {
         @Override
         public Integer getKey(Tuple2<String, Integer> value) {
-            if(value.f0==null){
+            if (value.f0 == null) {
                 return 3;
             }
             return Integer.parseInt(value.f0);
@@ -528,22 +541,24 @@ public class JSCComplete {
     }
 
     private static class YCFB_Finall_KeySelector implements KeySelector<ModelFirst, Integer> {//todo
+
         @Override
         public Integer getKey(ModelFirst value) {
-            if(value.getLevel_1()==null){
+            if (value.getLevel_1() == null) {
                 return 3;
-            }else {
+            } else {
                 return Integer.parseInt(value.getLevel_1()) + 2;
             }
         }
     }
 
     private static class YCFB_Finall_KeySelectorOne implements KeySelector<ModelFirst, Integer> {//todo
+
         @Override
         public Integer getKey(ModelFirst value) {
-            if(value.getLevel_1()==null){
+            if (value.getLevel_1() == null) {
                 return 1;
-            }else {
+            } else {
                 return Integer.parseInt(value.getLevel_1());
             }
         }
@@ -606,7 +621,7 @@ public class JSCComplete {
                 return Tuple5.of(name, All_Num, Used_Num, YC_Num, 0d);
             } else {
                 double result = Double.parseDouble(String.valueOf(YC_Num)) / Double.parseDouble(String.valueOf(All_Num));
-                double v2 = Double.parseDouble(String.format("%.3f", result))*100;
+                double v2 = Double.parseDouble(String.format("%.3f", result)) * 100;
                 return Tuple5.of(name, All_Num, Used_Num, YC_Num, v2);
             }
         }
@@ -633,8 +648,8 @@ public class JSCComplete {
                         for (Tuple2<String, Integer> s1 : second) {
                             tuple3.f2 = s1.f1;
                         }
-                        if(tuple3.f0==null){
-                            tuple3.f0="其他";
+                        if (tuple3.f0 == null) {
+                            tuple3.f0 = "其他";
                         }
                         if (tuple3.f1 == null) {
                             tuple3.f1 = 0;
@@ -804,7 +819,7 @@ public class JSCComplete {
                 return Tuple5.of(id, name, Num_GJ, Num_ALL, 0d);
             } else {
                 double result = Double.parseDouble(String.valueOf(Num_GJ)) / Double.parseDouble(String.valueOf(ALL_NUMBER));
-                double v2 = Double.parseDouble(String.format("%.3f", result))*100;
+                double v2 = Double.parseDouble(String.format("%.3f", result)) * 100;
                 return Tuple5.of(id, name, Num_GJ, Num_ALL, v2);
             }
         }
