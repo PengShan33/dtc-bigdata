@@ -66,7 +66,10 @@ public class OpenTSDBFlatMapFunction extends RichFlatMapFunction<Tuple5<String, 
         String func = "";
         if (StringUtils.isEmpty(String.valueOf(index))) {
             func = Aggregator.avg.toString();
-        } else if (index == FunctionEnum.MAX.getOrder()) {
+            return func;
+        }
+
+        if (index == FunctionEnum.MAX.getOrder()) {
             func = Aggregator.max.toString();
         } else if (index == FunctionEnum.MIN.getOrder()) {
             func = Aggregator.min.toString();
