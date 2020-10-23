@@ -155,6 +155,19 @@ function start_flink-snmp {
     fi
 }
 
+function start_flink-alarm {
+    if ! which java >/dev/null 2>&1 ; then
+        return 2;
+    fi
+    nohup ${FLINK_SUBMIT} run ${FM_HOME}/lib/flink/alarm/dtc-alarm.jar &
+    local test=$?
+    if [ ${test} -ne 0 ];then
+        echo "submit is failed!"
+    else
+        echo "submit is success!!"
+    fi
+}
+
 function start_flink-sc {
     if ! which java >/dev/null 2>&1 ; then
         return 2;
