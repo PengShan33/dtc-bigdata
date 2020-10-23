@@ -184,7 +184,7 @@ public class ZxSwitchProcessMapFunction extends ProcessWindowFunction<DataStruct
             double cardNum = 0;
             String systemName = null;
             String host = null;
-            String zbFourName = "102_103_104_101_101";
+            String zbFourName = "102_103_104_103_103";
             String zbLastCode = "";
             String nameCn = "板卡数量";
             String nameEn = "card_num";
