@@ -38,11 +38,17 @@ public class OpenTSDBFlatMapFunction extends RichFlatMapFunction<Tuple5<String, 
     public void flatMap(Tuple5<String, String, Integer, Integer, String> tuple5,
                         Collector<Tuple6<String, String, Integer, Integer, String, Map<String, Object>>> collector) throws Exception {
         Tuple6<String, String, Integer, Integer, String, Map<String, Object>> tuple6 = getResult(tuple5);
-        collector.collect(tuple6);
+        if (null != tuple6) {
+            collector.collect(tuple6);
+        }
     }
 
     private Tuple6<String, String, Integer, Integer, String, Map<String, Object>> getResult(
             Tuple5<String, String, Integer, Integer, String> tuple5) throws IOException {
+
+        if (StringUtils.isEmpty(tuple5.f0)) {
+            return null;
+        }
         //code,ipv4,target,pastTimeSecond,subcode
         String code = tuple5.f0;
         String ip = tuple5.f1;
