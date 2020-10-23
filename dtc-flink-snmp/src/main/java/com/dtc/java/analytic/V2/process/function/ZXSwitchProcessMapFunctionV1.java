@@ -17,7 +17,7 @@ import java.util.Map;
  * @author :hao.li
  */
 @Slf4j
-public class ZXSwitchProcessMapFunction extends ProcessWindowFunction<DataStruct, DataStruct, Tuple, TimeWindow> {
+public class ZXSwitchProcessMapFunctionV1 extends ProcessWindowFunction<DataStruct, DataStruct, Tuple, TimeWindow> {
     /**
      * 此处的map<code(in.f2.in.f3),value_time>
      * */

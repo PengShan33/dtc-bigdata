@@ -261,6 +261,9 @@ public class WinProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
             } else if ("107_107_101_101_101".equals(wc.getZbFourName())) {
                 collector.collect(new DataStruct(wc.getSystem_name(), wc.getHost(), wc.getZbFourName(), wc.getZbLastCode(), wc.getNameCN(), wc.getNameEN(), wc.getTime(), wc.getValue()));
             }
+
+            //剩余其它的数据也写出去
+            collector.collect(wc);
         }
     }
 

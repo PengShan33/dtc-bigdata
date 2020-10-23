@@ -49,17 +49,18 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
         Map net_packets_recv = new HashMap<String, String>();
 
         for (DataStruct in : elements) {
+            //主机系统参数：系统启动时间，后端判断在离线(默认给数字1，opents里存储数值型)
+            if ("101_101_101_106_106".equals(in.getZbFourName())) {
+                collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), "1"));
+                continue;
+            }
+
             //判断数据类型是否是数值型
             boolean strResult = in.getValue().matches("(^-?[0-9][0-9]*(.[0-9]+)?)$");
             if (!strResult) {
                 log.info("value is not number of string!" + in.getValue());
                 //TODO 若数据不是数值型，可以将数据存到hbse中，例如时间
             } else {
-                //主机系统参数：系统启动时间，后端判断在离线(默认给数字1，opents里存储数值型)
-                if ("101_101_101_106_106".equals(in.getZbFourName())) {
-                    collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), "1"));
-                    continue;
-                }
 
                 //主机网络接口状态：获取网络接口数量
                 if ("101_101_101_109_109".equals(in.getZbFourName())) {

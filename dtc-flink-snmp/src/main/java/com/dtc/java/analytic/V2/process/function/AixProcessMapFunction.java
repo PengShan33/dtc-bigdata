@@ -2,9 +2,11 @@ package com.dtc.java.analytic.V2.process.function;
 
 import com.dtc.java.analytic.V2.common.model.DataStruct;
 import com.dtc.java.analytic.V2.enums.AixCodeTypeEnum;
+import com.dtc.java.analytic.V2.sink.mysql.MySqlSinkUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.java.tuple.Tuple;
+import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
@@ -21,7 +23,7 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
      * 内存总大小
      */
     private Double memTotalSize;
-    private Double memUsedSize;
+
     /**
      * kb转换为gb单位
      */
@@ -84,21 +86,25 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
      */
     private Map<String, String> outOctetsMap = new HashMap<>(20);
 
+    private Map<String, String> portNumMap = new HashMap<>(20);
+
 
     @Override
     public void process(Tuple tuple, Context context, Iterable<DataStruct> elements, Collector<DataStruct> out) throws Exception {
+        ParameterTool parameters = (ParameterTool)
+                getRuntimeContext().getExecutionConfig().getGlobalJobParameters();
 
         for (DataStruct element : elements) {
+            //主机系统参数：系统启动时间，后端判断在离线(默认给数字1，opents里存储数值型)
+            if (AixCodeTypeEnum.AIX_SYSTEM_UP_TIME.getCode().equals(element.getZbFourName())) {
+                out.collect(new DataStruct(element.getSystem_name(), element.getHost(), element.getZbFourName(), element.getZbLastCode(), element.getNameCN(), element.getNameEN(), element.getTime(), "1"));
+                continue;
+            }
             //判断数据类型是否是数值型
             boolean result = element.getValue().matches("(^-?[0-9][0-9]*(.[0-9]+)?)$");
             if (!result) {
                 log.info("value is not number of string!" + element.getValue());
             } else {
-                //主机系统参数：系统启动时间，后端判断在离线(默认给数字1，opents里存储数值型)
-                if (AixCodeTypeEnum.AIX_SYSTEM_UP_TIME.getCode().equals(element.getZbFourName())) {
-                    out.collect(new DataStruct(element.getSystem_name(), element.getHost(), element.getZbFourName(), element.getZbLastCode(), element.getNameCN(), element.getNameEN(), element.getTime(), "1"));
-                    continue;
-                }
 
                 // cpu使用率,直接使用
                 if (AixCodeTypeEnum.AIX_SECPU_UTILIZATION.getCode().equals(element.getZbFourName())) {
@@ -210,19 +216,50 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
                     continue;
                 }
 
-                //端口入流量
+                //各端口入流量
                 if (AixCodeTypeEnum.AIX_IN_OCTETS.getCode().equals(element.getZbFourName())) {
                     String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
                     String value = element.getValue();
                     inOctetsMap.put(key, value);
+
+                    out.collect(element);
                     continue;
                 }
 
-                //端口出流量
+                //各端口出流量
                 if (AixCodeTypeEnum.AIX_OUT_OCTETS.getCode().equals(element.getZbFourName())) {
                     String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
                     String value = element.getValue();
                     outOctetsMap.put(key, value);
+
+                    out.collect(element);
+                    continue;
+                }
+
+                //各端口状态
+                if (AixCodeTypeEnum.AIX_OPER_STATUS.getCode().equals(element.getZbFourName())) {
+                    //端口编码写入后端的mysql库
+                    MySqlSinkUtils.subCodeSinktoMysql(element,parameters);
+                    //端口数量的计算
+                    String key = element.getHost() + "-" + element.getZbFourName() + "-" + element.getZbLastCode();
+                    String value = element.getValue();
+                    portNumMap.put(key, value);
+
+                    out.collect(element);
+                    continue;
+                }
+
+                //网络接口数量,直接使用
+                if (AixCodeTypeEnum.AIX_IF_NUM.getCode().equals(element.getZbFourName())) {
+                    out.collect(element);
+                    continue;
+                }
+
+                //各网络接口当前带宽,直接使用
+                if (AixCodeTypeEnum.AIX_IF_SPEED.getCode().equals(element.getZbFourName())) {
+                    //接口编码写入后端的mysql库
+                    MySqlSinkUtils.subCodeSinktoMysql(element,parameters);
+                    out.collect(element);
                     continue;
                 }
             }
@@ -241,11 +278,40 @@ public class AixProcessMapFunction extends ProcessWindowFunction<DataStruct, Dat
         sendPackagesProcess(out);
         //接收报文数
         receivePackagesProcess(out);
-        //端口入流量
+        //所有端口入流量总计
         inOctetsProcess(out);
-        //端口出流量
+        //所有端口出流量总计
         outOctetsProcess(out);
+        //端口数量计算
+        portNumProcess(out);
 
+    }
+
+    /**
+     * 端口数量计算
+     *
+     * @param out
+     */
+    private void portNumProcess(Collector<DataStruct> out) {
+        if (isNotEmpty(portNumMap)) {
+            double portNum = 0;
+            String systemName = null;
+            String host = null;
+            String zbFourName = "101_102_105_124_124";
+            String zbLastCode = "";
+            String nameCn = "端口数量";
+            String nameEn = "aix_port_num";
+            String time = String.valueOf(System.currentTimeMillis());
+            for (String key1 : outOctetsMap.keySet()) {
+                String[] split = key1.split("-");
+                host = split[0];
+                systemName = split[1].split("_")[0] + "_" + split[1].split("_")[1] + "|aix";
+                portNum++;
+            }
+            String value = String.valueOf(portNum);
+            out.collect(new DataStruct(systemName, host, zbFourName, zbLastCode, nameCn, nameEn, time, value));
+            portNumMap.clear();
+        }
     }
 
     /**

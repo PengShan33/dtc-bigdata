@@ -45,52 +45,93 @@ public class PSinkToOpentsdb extends RichSinkFunction<DataStruct> {
             java.text.DecimalFormat df = new java.text.DecimalFormat("#.##");
             double result = Double.parseDouble(df.format(Double.parseDouble(value.getValue())));
             if (value.getSystem_name().contains("h3c_switch")) {
-                String metircs = metric + "-" + host + "-" + id;
                 //华三交换机存储opentsdb策略
-                builder.addMetric(metircs)
-                        .setDataPoint(time, result)
-                        .addTag("type", "h3c_swtich")
-                        .addTag("host", host);
+                if (id.isEmpty()) {
+                    String metrics =metric + "-" +host;
+                    builder.addMetric(metrics)
+                            .setDataPoint(time, result)
+                            .addTag("type", "h3c_swtich")
+                            .addTag("host", host);
+                } else {
+                    String metrics = metric + "-" + host + "-" + id;
+                    builder.addMetric(metrics)
+                            .setDataPoint(time, result)
+                            .addTag("type", "h3c_swtich")
+                            .addTag("host", host)
+                            .addTag("lastcode", id);
+                }
             } else if (value.getSystem_name().contains("zx_swtich")) {
-                String metircs = metric + "-" + host + "-" + id;
                 //中兴交换机存储opentsdb策略
-                builder.addMetric(metircs)
-                        .setDataPoint(time, result)
-                        .addTag("type", "zx_swtich")
-                        .addTag("host", host);
+                if (id.isEmpty()) {
+                    String metrics =metric + "-" +host;
+                    builder.addMetric(metrics)
+                            .setDataPoint(time, result)
+                            .addTag("type", "zx_swtich")
+                            .addTag("host", host);
+                } else {
+                    String metrics = metric + "-" + host + "-" + id;
+                    builder.addMetric(metrics)
+                            .setDataPoint(time, result)
+                            .addTag("type", "zx_swtich")
+                            .addTag("host", host)
+                            .addTag("lastcode", id);
+                }
             } else if (value.getSystem_name().contains("dpi")) {
-                String metircs = metric + "-" + host + "-" + id;
                 //dpi存储opentsdb策略
-                builder.addMetric(metircs)
+                String metrics = metric + "-" + host + "-" + id;
+                builder.addMetric(metrics)
                         .setDataPoint(time, result)
                         .addTag("type", "dpi")
-                        .addTag("host", host);
+                        .addTag("host", host)
+                        .addTag("lastcode", id);
             } else if (value.getSystem_name().contains("win")) {
+                //windows存储opentsdb策略
                 if (id.isEmpty()) {
-                    String metircs = metric + "-" + host;
-                    builder.addMetric(metircs)
+                    String metrics = metric + "-" + host;
+                    builder.addMetric(metrics)
                             .setDataPoint(time, result)
                             .addTag("type", "win")
                             .addTag("host", host);
                 } else {
-                    String metircs = metric + "-" + host + "-" + id;
-                    builder.addMetric(metircs)
+                    String metrics = metric + "-" + host + "-" + id;
+                    builder.addMetric(metrics)
                             .setDataPoint(time, result)
                             .addTag("type", "win")
+                            .addTag("host", host)
+                            .addTag("lastcode", id);
+                }
+            } else if (value.getSystem_name().contains("aix")) {
+                //aix存储opentsdb策略
+                if (id.isEmpty()) {
+                    String metrics = metric + "-" + host;
+                    builder.addMetric(metrics)
+                            .setDataPoint(time, result)
+                            .addTag("type", "aix")
+                            .addTag("host", host);
+                } else {
+                    String metrics = metric + "-" + host + "-" + id;
+                    builder.addMetric(metrics)
+                            .setDataPoint(time, result)
+                            .addTag("type", "aix")
                             .addTag("lastcode", id)
                             .addTag("host", host);
                 }
-            } else if (value.getSystem_name().contains("aix")) {
-                builder.addMetric(metric + "-" + host)
-                        .setDataPoint(time, result)
-                        .addTag("type", "aix")
-                        .addTag("host", host);
             } else if (value.getSystem_name().contains("h3c_router")) {
-                String metircs = metric + "-" + host + "-" + id;
-                builder.addMetric(metircs)
-                        .setDataPoint(time, result)
-                        .addTag("type", "h3c_router")
-                        .addTag("host", host);
+                //华三路由器存储opentsdb策略
+                if (id.isEmpty()) {
+                    String metrics = metric + "-" + host;
+                    builder.addMetric(metrics)
+                            .setDataPoint(time, result)
+                            .addTag("type", "h3c_router")
+                            .addTag("host", host);
+                } else {
+                    String metrics = metric + "-" + host + "-" + id;
+                    builder.addMetric(metrics)
+                            .setDataPoint(time, result)
+                            .addTag("type", "h3c_router")
+                            .addTag("lastcode", id)
+                            .addTag("host", host);
+                }
             } else {
                 builder.addMetric(metric + "-" + host)
                         .setDataPoint(time, result)

@@ -133,6 +133,7 @@ public class PropertiesConstants {
     public static final String MYSQL_USERNAME = "mysql.username";
     public static final String MYSQL_ALAEM_TABLE = "mysql.alarm_rule_table";
     public static final String MYSQL_WINDOWS_TABLE = "mysql.windows_disk_sql";
+    public static final String MYSQL_SUBCODE_TABLE = "mysql.subcode_sql";
 
     //redis
     public static final String REDIS_IP="dtc.redis.ip";

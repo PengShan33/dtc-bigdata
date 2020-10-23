@@ -17,7 +17,7 @@ import java.util.Map;
  * @author :hao.li
  */
 @Slf4j
-public class H3CSwitchProcessMapFunction extends ProcessWindowFunction<DataStruct, DataStruct, Tuple, TimeWindow> {
+public class H3CSwitchProcessMapFunctionV1 extends ProcessWindowFunction<DataStruct, DataStruct, Tuple, TimeWindow> {
     /**
      * 此处的map<code(in.f2.in.f3),value_time>
      */
@@ -42,7 +42,7 @@ public class H3CSwitchProcessMapFunction extends ProcessWindowFunction<DataStruc
                      * (102_101,ip,102_101_101_101_101,101.1.0,time,value)
                      *其中ZB_code为例：机器ip,1.0表示机框1，0板卡，表示机框1，板卡0的cpu使用率
                      */
-                    collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), in.getZbFourName(), in.getZbLastCode(), in.getNameCN(), in.getNameEN(), in.getTime(), in.getValue()));
+                    collector.collect(in);
                     continue;
                 }
                 if (code.equals("102_101_103_108_109")) {
