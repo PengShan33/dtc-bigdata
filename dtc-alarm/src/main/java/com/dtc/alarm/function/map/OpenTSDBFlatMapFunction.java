@@ -3,6 +3,7 @@ package com.dtc.alarm.function.map;
 import com.dtc.alarm.constant.PropertiesConstants;
 import com.dtc.alarm.enums.FunctionEnum;
 import com.dtc.alarm.util.OpenTSDBUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple5;
@@ -19,6 +20,7 @@ import java.util.Map;
 /**
  * @author
  */
+@Slf4j
 public class OpenTSDBFlatMapFunction extends RichFlatMapFunction<Tuple5<String, String, Integer, Integer, String>,
         Tuple6<String, String, Integer, Integer, String, Map<String, Object>>> {
 
@@ -63,6 +65,11 @@ public class OpenTSDBFlatMapFunction extends RichFlatMapFunction<Tuple5<String, 
         }
 
         Map<String, Object> map = OpenTSDBUtil.queryOpenTSDB(httpClient, metric, ip, func, pastTimeSecond);
+        if (null == map || map.isEmpty()) {
+            log.info("query data from opentsdb is empty,metric is {},func is {}", metric, func);
+            return null;
+        }
+
         return Tuple6.of(code, ip, tuple5.f2, pastTimeSecond, tuple5.f4, map);
     }
 
