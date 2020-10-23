@@ -21,6 +21,7 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -125,13 +126,23 @@ public class AlarmUtil {
 
             @Override
             public void processBroadcastElement(Map<String, String> value, Context ctx, Collector<AlertStruct> out) throws Exception {
+
                 if (value == null || value.size() == 0) {
                     return;
                 }
-                if (value != null) {
-                    BroadcastState<String, String> broadcastState = ctx.getBroadcastState(ALARM_RULES);
-                    for (Map.Entry<String, String> entry : value.entrySet()) {
-                        broadcastState.put(entry.getKey(), entry.getValue());
+
+                BroadcastState<String, String> broadcastState = ctx.getBroadcastState(ALARM_RULES);
+                Iterator<Map.Entry<String, String>> valueIterator = value.entrySet().iterator();
+                while (valueIterator.hasNext()) {
+                    Map.Entry<String, String> entry = valueIterator.next();
+                    broadcastState.put(entry.getKey(), entry.getValue());
+                }
+
+                Iterator<Map.Entry<String, String>> broadcastIterator = broadcastState.entries().iterator();
+                while (broadcastIterator.hasNext()) {
+                    Map.Entry<String, String> entry = broadcastIterator.next();
+                    if (!value.containsKey(entry.getKey())) {
+                        broadcastIterator.remove();
                     }
                 }
             }
