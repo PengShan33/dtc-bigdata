@@ -37,7 +37,7 @@
 ## 主要架构
 
 - 实时告警/日志处理架构图
-  ![实时架构图](https://github.com/LihaoLixue/demo_dtc/blob/master/image/实时告警处理架构图.png)
+  ![实时架构图](./image/实时告警处理架构图.png)
 
 
 - 数仓架构图
