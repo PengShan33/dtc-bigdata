@@ -4,11 +4,11 @@ import com.dtc.alarm.constant.PropertiesConstants;
 import com.dtc.alarm.constant.TimesConstats;
 import com.dtc.alarm.domain.AlarmAssetIndexCode;
 import com.dtc.alarm.domain.AlarmMessage;
-import com.dtc.alarm.domain.AlertStruct;
+import com.dtc.alarm.domain.AlterStruct;
 import com.dtc.alarm.function.map.AlarmMessageMapFunction;
 import com.dtc.alarm.function.map.OpenTSDBFlatMapFunction;
 import com.dtc.alarm.function.process.AlarmMessageProcessWindowFunction;
-import com.dtc.alarm.sink.AlarmMessageWriter;
+import com.dtc.alarm.sink.AlarmMessageSinkToMysql;
 import com.dtc.alarm.source.mysql.AlarmAssetIndexCodeReader;
 import com.dtc.alarm.source.mysql.AlarmMessageReader;
 import com.dtc.alarm.util.AlarmUtil;
@@ -59,18 +59,20 @@ public class AlarmHandler {
                     .timeWindow(Time.milliseconds(windowSizeMillis)).process(new AlarmMessageProcessWindowFunction());
 
             alarmDataStream = dataStream.map(new AlarmMessageMapFunction());
+            alarmDataStream.print("告警规则广播变量:\n");
             BroadcastStream<Map<String, String>> broadcast = alarmDataStream.broadcast(ALARM_RULES);
             // code,ipv4,target,pastTimeSecond,subcode
             DataStream<Tuple5<String, String, Integer, Integer, String>> joinStream = AlarmDataStreamJoinHandler.join(alarmMessageSource, indexCodeSource, windowSizeMillis);
 
             //查询opentsdb
             DataStream<Tuple6<String, String, Integer, Integer, String, Map<String, Object>>> opentsdbSource = joinStream.flatMap(new OpenTSDBFlatMapFunction());
+            opentsdbSource.print("读opentsdb数据\n");
 
             //指标告警处理
-            List<DataStream<AlertStruct>> alrmStream = AlarmUtil.getAlarm(opentsdbSource, broadcast, build);
+            List<DataStream<AlterStruct>> alarmStream = AlarmUtil.getAlarm(opentsdbSource, broadcast, build);
 
             //写入mysql
-            alrmStream.forEach(alarm -> alarm.addSink(new AlarmMessageWriter()));
+            alarmStream.forEach(alarm -> alarm.addSink(new AlarmMessageSinkToMysql()));
             env.execute("dtc-alarm-job");
         }
     }

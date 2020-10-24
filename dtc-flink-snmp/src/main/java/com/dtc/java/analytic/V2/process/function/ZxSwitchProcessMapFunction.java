@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 华三交换机处理逻辑
+ * 中兴交换机处理逻辑
  *
  */
 @Slf4j
