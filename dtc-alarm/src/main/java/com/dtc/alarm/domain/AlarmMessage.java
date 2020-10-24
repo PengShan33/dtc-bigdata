@@ -95,6 +95,16 @@ public class AlarmMessage {
     private Integer pastTimeSecond;
 
     /**
+     * 时间周期（新）
+     */
+    private Integer pastTime;
+
+    /**
+     * 时间周期单位
+     */
+    private String timeUnit;
+
+    /**
      * 1:最大值 2:最小值 3:平均值
      */
     private Integer target;

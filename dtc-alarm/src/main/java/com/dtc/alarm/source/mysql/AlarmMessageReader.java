@@ -177,6 +177,8 @@ public class AlarmMessageReader extends RichSourceFunction<AlarmMessage> {
                     alarmMessage.setPastTimeSecond(resultSet.getInt("past_time_second"));
                     alarmMessage.setTarget(resultSet.getInt("target"));
                     alarmMessage.setConAlarm(resultSet.getString("con_alarm"));
+                    alarmMessage.setPastTime(resultSet.getInt("past_time"));
+                    alarmMessage.setTimeUnit(resultSet.getString("time_unit"));
 
                     context.collect(alarmMessage);
                 }

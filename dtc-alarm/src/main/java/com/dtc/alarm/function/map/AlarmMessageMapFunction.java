@@ -1,7 +1,7 @@
 package com.dtc.alarm.function.map;
 
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.java.tuple.Tuple19;
+import org.apache.flink.api.java.tuple.Tuple21;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,18 +9,18 @@ import java.util.Map;
 /**
  * @author
  */
-public class AlarmMessageMapFunction implements MapFunction<Map<String, Tuple19<String, String, String, Double, Double,
+public class AlarmMessageMapFunction implements MapFunction<Map<String, Tuple21<String, String, String, Double, Double,
         Double, Double, String, String, String, String,
-        String, String, String, String, String, Integer, Integer, String>>, Map<String, String>> {
+        String, String, String, String, String, Integer, Integer, String, Integer, String>>, Map<String, String>> {
 
 
     @Override
-    public Map<String, String> map(Map<String, Tuple19<String, String, String, Double, Double, Double,
+    public Map<String, String> map(Map<String, Tuple21<String, String, String, Double, Double, Double,
             Double, String, String, String, String, String,
-            String, String, String, String, Integer, Integer, String>> tuple19Map) throws Exception {
+            String, String, String, String, Integer, Integer, String, Integer, String>> tuple21Map) throws Exception {
 
         Map<String, String> map = new HashMap<>(100);
-        tuple19Map.forEach((k, v) -> {
+        tuple21Map.forEach((k, v) -> {
 
             String assetId = v.f0;
             String ip = v.f1;
@@ -41,6 +41,8 @@ public class AlarmMessageMapFunction implements MapFunction<Map<String, Tuple19<
             Integer pastTimeSecond = v.f16;
             Integer target = v.f17;
             String conAlarm = v.f18;
+            Integer pastTime = v.f19;
+            String timeUnit = v.f20;
             StringBuffer buffer = new StringBuffer();
             buffer.append(assetId).append(":")
                     .append(code).append(":")
@@ -57,6 +59,8 @@ public class AlarmMessageMapFunction implements MapFunction<Map<String, Tuple19<
                     .append(pastTimeSecond).append(":")
                     .append(target).append(":")
                     .append(conAlarm).append(":")
+                    .append(pastTime).append(":")
+                    .append(timeUnit).append(":")
                     .append(levelOne).append("|")
                     .append(levelTwo).append("|")
                     .append(levelThree).append("|")

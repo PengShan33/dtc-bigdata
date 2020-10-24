@@ -16,7 +16,7 @@ import com.dtc.alarm.util.ExecutionEnvUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.state.MapStateDescriptor;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
-import org.apache.flink.api.java.tuple.Tuple19;
+import org.apache.flink.api.java.tuple.Tuple21;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.api.java.tuple.Tuple6;
 import org.apache.flink.api.java.utils.ParameterTool;
@@ -53,9 +53,9 @@ public class AlarmHandler {
             DataStreamSource<AlarmMessage> alarmMessageSource = env.addSource(new AlarmMessageReader()).setParallelism(1);
             DataStreamSource<AlarmAssetIndexCode> indexCodeSource = env.addSource(new AlarmAssetIndexCodeReader()).setParallelism(1);
 
-            DataStream<Map<String, Tuple19<String, String, String, Double, Double, Double,
-                    Double, String, String, String, String, String,
-                    String, String, String, String, Integer, Integer, String>>> dataStream = alarmMessageSource.keyBy("assetId", "code")
+            DataStream<Map<String, Tuple21<String, String, String, Double, Double, Double,
+                                Double, String, String, String, String, String,
+                                String, String, String, String, Integer, Integer, String,Integer,String>>> dataStream = alarmMessageSource.keyBy("assetId", "code")
                     .timeWindow(Time.milliseconds(windowSizeMillis)).process(new AlarmMessageProcessWindowFunction());
 
             alarmDataStream = dataStream.map(new AlarmMessageMapFunction());
