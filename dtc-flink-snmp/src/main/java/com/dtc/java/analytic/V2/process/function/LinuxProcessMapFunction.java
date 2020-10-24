@@ -483,7 +483,7 @@ public class LinuxProcessMapFunction extends ProcessWindowFunction<DataStruct, D
 
         //共享内存
         String memoryShared = df.format(memShared / 1024d);
-        collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), "101_101_104_111_111", "000", in.getNameCN(), in.getNameEN(), in.getTime(), memoryCached));
+        collector.collect(new DataStruct(in.getSystem_name(), in.getHost(), "101_101_104_111_111", "000", in.getNameCN(), in.getNameEN(), in.getTime(), memoryShared));
 
         //内存使用率
         String memoryUsedRate;
