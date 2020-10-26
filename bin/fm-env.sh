@@ -6,10 +6,20 @@ export PLUGINS_DIRS=${FM_HOME}/plugins
 export NATIVE_DIR=${FM_HOME}/native
 export LOG_DIR=${FM_HOME}/logs
 
+#######FLINK_HOME########
+if [ -x "$FLINK_HOME/bin/flink" ]; then
+    FLINK="$FLINK_HOME/bin/flink"
+else
+    FLINK=`which flink`
+fi
+if [ ! -x "$FLINK" ]; then
+    echo "Could not find any executable flink binary. Please install java in your PATH or set FLINK_HOME"
+    exit 1
+fi
 # defaults
 #export EXEC="echo"
 export EXEC="exec"
-export FLINK_SUBMIT='/opt/flink/bin/flink'
+export FLINK_SUBMIT=$FLINK
 export HOURLY_CLASS=com.dtc.analytics.works.Hourly
 export FLINK_LOG_ZABBIX_CLASS=com.dtc.java.analytic.zabbix.PrometheusToFlink
 export FLINK_LOG_SNMP_CLASS=com.dtc.java.analytic.snmp.StreamToFlink

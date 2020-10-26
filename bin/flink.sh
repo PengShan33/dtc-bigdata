@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 #useage:flink.sh flink-log start
-export PATH=/etc:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/home/dtc/software/java/bin
-source ~/.bash_profile
+export PATH=/etc:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+#######JAVA_HOME########
+if [ ! -x "$JAVA_HOME" ]; then
+    echo "Could not find any executable java binary. Please install java in your PATH or set JAVA_HOME"
+    exit 1
+fi
+export PATH=$PATH:$JAVA_HOME/bin
 
 if [ -z "${FM_HOME}" ];then
     FM_HOME=$(cd `dirname $0`;cd ..; pwd)
