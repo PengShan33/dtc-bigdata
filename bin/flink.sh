@@ -22,13 +22,12 @@ if [ -z "${LOG_DIR}" ];then
 fi
 
 if [ -z "${FM_CONF_DIR}" ] || [ ! -d "${FM_CONF_DIR}" ];then
-    FM_CONF_DIR=${FM_HOME}/bin
+    FM_CONF_DIR=${FM_HOME}/conf
 fi
-export FM_CONF_DIRF
+export FM_CONF_DIR
 
-if [ -f ${FM_CONF_DIR}/fm-env.sh ];then
-    source ${FM_CONF_DIR}/fm-env.sh
-fi
+#invoke the fm-env.sh
+source $FM_HOME/bin/fm-env.sh
 
 function usage {
     echo "Usage: `basename $0` <service> (status|start|stop|restart) [-f] [-w 10]"
