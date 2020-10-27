@@ -99,7 +99,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>main.java.com.dtc.alarm.AlarmHandler</mainClass>
+                            <mainClass>com.dtc.alarm.AlarmHandler</mainClass>
                         </manifest>
                     </archive>
                     <appendAssemblyId>false</appendAssemblyId>
